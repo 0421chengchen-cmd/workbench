@@ -1,0 +1,4138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>个人时间规划 · 全年工作台</title>
+
+<!-- PWA Meta Tags -->
+<meta name="description" content="个人时间规划全年工作台 - 7大模块时间管理 + 每日复盘 + 数据同步">
+<meta name="theme-color" content="#1a1a2e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="时间规划工作台">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="manifest" href="manifest.json">
+<style>
+/* ========== CSS Variables ========== */
+:root {
+  --bg: #f5f5f7;
+  --bg-card: #ffffff;
+  --bg-sidebar: #1a1a2e;
+  --bg-sidebar-active: rgba(255,255,255,0.08);
+  --text-primary: #1a1a2e;
+  --text-secondary: #6b7280;
+  --text-sidebar: #a0a0b8;
+  --text-sidebar-active: #ffffff;
+  --border: #e5e7eb;
+  --shadow: 0 2px 12px rgba(0,0,0,0.06);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.1);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --c-design: #8b5cf6;
+  --c-stream: #ec4899;
+  --c-fitness: #f97316;
+  --c-dance: #3b82f6;
+  --c-sing: #14b8a6;
+  --c-english: #22c55e;
+  --c-ailearn: #6366f1;
+  --sidebar-w: 240px;
+}
+
+/* ========== Reset ========== */
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:15px;}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  background:var(--bg);
+  color:var(--text-primary);
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;}
+input,textarea{font-family:inherit;}
+
+/* ========== Layout ========== */
+.app{display:flex;min-height:100vh;}
+
+/* ========== Sidebar ========== */
+.sidebar{
+  width:var(--sidebar-w);
+  background:var(--bg-sidebar);
+  position:fixed;
+  top:0;left:0;bottom:0;
+  z-index:100;
+  display:flex;
+  flex-direction:column;
+  transition:transform .3s ease;
+}
+.sidebar-header{
+  padding:24px 20px 20px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.sidebar-logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.sidebar-logo .logo-icon{
+  width:36px;height:36px;
+  background:linear-gradient(135deg,#8b5cf6,#ec4899);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+}
+.sidebar-logo .logo-text{
+  color:#fff;
+  font-size:16px;
+  font-weight:700;
+  letter-spacing:.5px;
+}
+.sidebar-logo .logo-sub{
+  color:var(--text-sidebar);
+  font-size:11px;
+  margin-top:1px;
+}
+.sidebar-nav{
+  flex:1;
+  overflow-y:auto;
+  padding:12px 10px;
+}
+.sidebar-nav::-webkit-scrollbar{width:4px;}
+.sidebar-nav::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:4px;}
+.nav-item{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:11px 14px;
+  border-radius:10px;
+  color:var(--text-sidebar);
+  cursor:pointer;
+  transition:all .2s;
+  margin-bottom:2px;
+  font-size:14px;
+  font-weight:500;
+}
+.nav-item:hover{background:rgba(255,255,255,0.04);color:#fff;}
+.nav-item.active{background:var(--bg-sidebar-active);color:var(--text-sidebar-active);}
+.nav-item .nav-dot{
+  width:8px;height:8px;border-radius:50%;
+  flex-shrink:0;
+}
+.nav-item .nav-time{
+  margin-left:auto;
+  font-size:11px;
+  color:var(--text-sidebar);
+  opacity:.7;
+}
+.nav-item.active .nav-time{opacity:1;}
+.sidebar-footer{
+  padding:14px 20px;
+  border-top:1px solid rgba(255,255,255,0.06);
+  font-size:11px;
+  color:var(--text-sidebar);
+  text-align:center;
+}
+
+/* ========== Main ========== */
+.main{
+  flex:1;
+  margin-left:var(--sidebar-w);
+  padding:28px 32px;
+  min-height:100vh;
+}
+.page{display:none;animation:fadeIn .3s ease;}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+.page-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:24px;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.page-title{
+  font-size:26px;
+  font-weight:800;
+  letter-spacing:-.5px;
+}
+.page-title .emoji{margin-right:8px;}
+.page-subtitle{
+  font-size:13px;
+  color:var(--text-secondary);
+  margin-top:4px;
+}
+.page-badge{
+  padding:6px 14px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:600;
+  color:#fff;
+}
+
+/* ========== Cards ========== */
+.card{
+  background:var(--bg-card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:22px;
+  margin-bottom:18px;
+}
+.card-title{
+  font-size:15px;
+  font-weight:700;
+  margin-bottom:14px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+/* ========== Grid ========== */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+
+/* ========== Overview: Time Donut ========== */
+.donut-wrap{
+  display:flex;
+  align-items:center;
+  gap:32px;
+  flex-wrap:wrap;
+}
+.donut-chart{
+  position:relative;
+  width:200px;height:200px;
+  flex-shrink:0;
+}
+.donut-chart svg{transform:rotate(-90deg);}
+.donut-center{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+}
+.donut-center .num{font-size:36px;font-weight:800;}
+.donut-center .label{font-size:12px;color:var(--text-secondary);margin-top:2px;}
+.donut-legend{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  flex:1;
+  min-width:200px;
+}
+.legend-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:13px;
+}
+.legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.legend-name{flex:1;font-weight:500;}
+.legend-time{color:var(--text-secondary);font-weight:600;}
+.legend-pct{color:var(--text-secondary);font-size:11px;width:42px;text-align:right;}
+
+/* ========== Timeline ========== */
+.timeline{
+  position:relative;
+  padding-left:8px;
+}
+.timeline-item{
+  display:flex;
+  gap:16px;
+  margin-bottom:6px;
+  align-items:stretch;
+}
+.timeline-time{
+  width:64px;
+  font-size:12px;
+  font-weight:700;
+  color:var(--text-secondary);
+  text-align:right;
+  padding-top:14px;
+  flex-shrink:0;
+}
+.timeline-bar{
+  width:4px;
+  border-radius:4px;
+  flex-shrink:0;
+}
+.timeline-content{
+  flex:1;
+  padding:10px 16px;
+  background:var(--bg);
+  border-radius:var(--radius-sm);
+  margin-bottom:6px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.timeline-content .tc-name{font-size:14px;font-weight:600;}
+.timeline-content .tc-desc{font-size:12px;color:var(--text-secondary);margin-top:2px;}
+.timeline-content .tc-duration{
+  font-size:12px;
+  font-weight:700;
+  padding:4px 10px;
+  border-radius:8px;
+  color:#fff;
+  flex-shrink:0;
+}
+
+/* ========== Stats ========== */
+.stat-card{
+  background:var(--bg-card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:18px;
+  text-align:center;
+}
+.stat-num{font-size:28px;font-weight:800;}
+.stat-label{font-size:12px;color:var(--text-secondary);margin-top:4px;}
+.stat-icon{font-size:24px;margin-bottom:6px;}
+
+.stats-bar{
+  background:var(--bg-card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:16px 20px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-bottom:18px;
+}
+.stats-bar-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  flex:1;
+  min-width:120px;
+  justify-content:center;
+}
+.stats-bar-item:not(:last-child){
+  border-right:1px solid var(--border);
+}
+.stats-bar-item .sbi-icon{
+  width:38px;height:38px;
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;
+}
+.stats-bar-item .sbi-text{text-align:left;}
+.stats-bar-item .sbi-num{font-size:20px;font-weight:800;line-height:1;}
+.stats-bar-item .sbi-label{font-size:11px;color:var(--text-secondary);margin-top:2px;}
+
+/* ========== Weather Module ========== */
+.weather-card{
+  background:linear-gradient(135deg,#3b82f6,#06b6d4);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:20px;
+  color:#fff;
+  margin-bottom:18px;
+  position:relative;
+  overflow:hidden;
+}
+.weather-card::before{
+  content:'';
+  position:absolute;
+  top:-50%;right:-20%;
+  width:200px;height:200px;
+  background:rgba(255,255,255,0.08);
+  border-radius:50%;
+}
+.weather-card::after{
+  content:'';
+  position:absolute;
+  bottom:-30%;left:-10%;
+  width:160px;height:160px;
+  background:rgba(255,255,255,0.05);
+  border-radius:50%;
+}
+.weather-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:16px;
+  position:relative;
+  z-index:1;
+}
+.weather-title{
+  display:flex;align-items:center;gap:8px;
+  font-size:16px;font-weight:700;
+}
+.weather-update{
+  font-size:11px;opacity:.8;
+  display:flex;align-items:center;gap:6px;
+}
+.weather-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+  position:relative;
+  z-index:1;
+}
+.weather-location{
+  background:rgba(255,255,255,0.12);
+  border-radius:var(--radius-sm);
+  padding:16px;
+  backdrop-filter:blur(4px);
+}
+.weather-loc-name{
+  font-size:13px;font-weight:600;
+  margin-bottom:10px;
+  display:flex;align-items:center;gap:6px;
+}
+.weather-main{
+  display:flex;align-items:center;gap:12px;
+}
+.weather-icon{font-size:36px;line-height:1;}
+.weather-temp{font-size:28px;font-weight:800;line-height:1;}
+.weather-desc{font-size:12px;opacity:.9;margin-top:4px;}
+.weather-detail{
+  display:flex;gap:12px;
+  margin-top:10px;
+  font-size:11px;
+  opacity:.85;
+}
+.weather-detail span{
+  display:flex;align-items:center;gap:4px;
+}
+.weather-loading{
+  display:flex;align-items:center;justify-content:center;
+  gap:8px;
+  padding:20px;
+  font-size:13px;
+  opacity:.9;
+}
+.weather-error{
+  background:rgba(239,68,68,0.15);
+  border-radius:8px;
+  padding:10px 14px;
+  font-size:12px;
+  margin-top:10px;
+}
+@media(max-width:600px){
+  .weather-grid{grid-template-columns:1fr;}
+  .stats-bar-item:not(:last-child){border-right:none;border-bottom:1px solid var(--border);padding-bottom:10px;}
+  .stats-bar{flex-direction:column;align-items:stretch;}
+  .stats-bar-item{justify-content:flex-start;min-width:auto;}
+}
+
+/* ========== Checklist ========== */
+.checklist{display:flex;flex-direction:column;gap:8px;}
+.checklist-item{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:10px 14px;
+  background:var(--bg);
+  border-radius:var(--radius-sm);
+  cursor:pointer;
+  transition:all .2s;
+  font-size:14px;
+}
+.checklist-item:hover{background:#eef0f3;}
+.checklist-item.done{opacity:.5;}
+.checklist-item.done .ci-text{text-decoration:line-through;}
+.ci-box{
+  width:20px;height:20px;
+  border:2px solid #d1d5db;
+  border-radius:6px;
+  flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.checklist-item.done .ci-box{
+  background:var(--c-ailearn);
+  border-color:var(--c-ailearn);
+}
+
+/* ========== Timeline Checkbox ========== */
+.tl-check{
+  width:22px;height:22px;
+  border:2.5px solid #d1d5db;
+  border-radius:50%;
+  flex-shrink:0;
+  cursor:pointer;
+  transition:all .25s;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;
+}
+.tl-check:hover{border-color:#8b5cf6;transform:scale(1.1);}
+.tl-check.done{
+  background:#22c55e;
+  border-color:#22c55e;
+}
+.tl-check.done::after{
+  content:'';
+  width:6px;height:10px;
+  border-right:2.5px solid #fff;
+  border-bottom:2.5px solid #fff;
+  transform:rotate(45deg) translate(-1px,-1px);
+}
+.timeline-item.task-done .timeline-content{
+  opacity:.55;
+  background:#f0f0f0 !important;
+}
+.timeline-item.task-done .tc-name{
+  text-decoration:line-through;
+}
+.timeline-item.task-skipped .timeline-content{
+  border:2px dashed #f59e0b;
+  opacity:.7;
+}
+.timeline-item.task-delayed .timeline-time::after{
+  content:'⏰';
+  font-size:10px;
+  margin-left:2px;
+}
+
+/* ========== Daily Review ========== */
+.review-conclusion{
+  background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(236,72,153,0.08));
+  border-radius:var(--radius);
+  padding:20px;
+  margin-bottom:18px;
+  border-left:4px solid #8b5cf6;
+}
+.review-conclusion-label{
+  font-size:12px;font-weight:600;
+  color:var(--text-secondary);
+  text-transform:uppercase;
+  letter-spacing:1px;
+  margin-bottom:8px;
+}
+.review-conclusion-text{
+  font-size:16px;font-weight:700;
+  line-height:1.5;
+}
+.kiss-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+}
+.kiss-card{
+  border-radius:var(--radius-sm);
+  padding:18px;
+  border-top:4px solid;
+  background:var(--bg-card);
+  box-shadow:var(--shadow);
+}
+.kiss-card.keep{border-top-color:#22c55e;}
+.kiss-card.improve{border-top-color:#f59e0b;}
+.kiss-card.stop{border-top-color:#ef4444;}
+.kiss-card.start{border-top-color:#3b82f6;}
+.kiss-header{
+  display:flex;align-items:center;gap:8px;
+  margin-bottom:12px;
+}
+.kiss-badge{
+  font-size:11px;font-weight:700;
+  padding:3px 10px;
+  border-radius:6px;
+  color:#fff;
+}
+.kiss-card.keep .kiss-badge{background:#22c55e;}
+.kiss-card.improve .kiss-badge{background:#f59e0b;}
+.kiss-card.stop .kiss-badge{background:#ef4444;}
+.kiss-card.start .kiss-badge{background:#3b82f6;}
+.kiss-title{font-size:14px;font-weight:700;}
+.kiss-section{margin-bottom:10px;}
+.kiss-section:last-child{margin-bottom:0;}
+.kiss-section-label{
+  font-size:11px;font-weight:700;
+  color:var(--text-secondary);
+  text-transform:uppercase;
+  letter-spacing:.5px;
+  margin-bottom:4px;
+}
+.kiss-section-content{
+  font-size:13px;
+  line-height:1.6;
+  color:var(--text-primary);
+}
+.kiss-section-content textarea{
+  width:100%;
+  min-height:50px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:13px;
+  resize:vertical;
+  background:var(--bg);
+  color:var(--text-primary);
+}
+.kiss-section-content textarea:focus{
+  outline:none;
+  border-color:#8b5cf6;
+}
+.grai-card{
+  background:var(--bg-card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:22px;
+  margin-bottom:18px;
+  border-left:4px solid #6366f1;
+}
+.grai-section{
+  margin-bottom:16px;
+  padding-bottom:16px;
+  border-bottom:1px solid var(--border);
+}
+.grai-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0;}
+.grai-label{
+  display:flex;align-items:center;gap:8px;
+  font-size:14px;font-weight:700;
+  margin-bottom:8px;
+}
+.grai-label .grai-tag{
+  font-size:11px;font-weight:700;
+  padding:2px 8px;border-radius:4px;color:#fff;
+}
+.grai-content{
+  font-size:13px;
+  line-height:1.7;
+  color:var(--text-primary);
+  padding-left:4px;
+}
+.grai-content textarea{
+  width:100%;
+  min-height:60px;
+  border:1px solid var(--border);
+  border-radius:8px;
+  padding:8px 10px;
+  font-size:13px;
+  resize:vertical;
+  background:var(--bg);
+  color:var(--text-primary);
+}
+.grai-content textarea:focus{outline:none;border-color:#6366f1;}
+.review-meta-card{
+  background:var(--bg-card);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:18px;
+  margin-bottom:14px;
+}
+.review-meta-title{
+  font-size:14px;font-weight:700;
+  margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;
+}
+.review-meta-item{
+  padding:8px 12px;
+  background:var(--bg);
+  border-radius:8px;
+  margin-bottom:6px;
+  font-size:13px;
+  line-height:1.5;
+}
+.review-meta-item:last-child{margin-bottom:0;}
+.review-action-highlight{
+  background:linear-gradient(135deg,rgba(245,158,11,0.1),rgba(236,72,153,0.06));
+  border-radius:var(--radius);
+  padding:18px;
+  margin-bottom:18px;
+  border:2px solid rgba(245,158,11,0.2);
+}
+.review-pending{
+  background:rgba(239,68,68,0.06);
+  border-radius:var(--radius-sm);
+  padding:14px;
+  margin-bottom:14px;
+  border-left:3px solid #ef4444;
+}
+.review-failed{
+  background:rgba(107,114,128,0.06);
+  border-radius:var(--radius-sm);
+  padding:14px;
+  border-left:3px solid #6b7280;
+}
+.review-save-bar{
+  position:sticky;
+  bottom:20px;
+  background:var(--bg-card);
+  border-radius:var(--radius);
+  box-shadow:0 4px 20px rgba(0,0,0,0.12);
+  padding:14px 20px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:18px;
+  z-index:10;
+}
+.review-save-info{font-size:13px;color:var(--text-secondary);}
+.review-save-btn{
+  background:linear-gradient(135deg,#8b5cf6,#ec4899);
+  color:#fff;border:none;border-radius:10px;
+  padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer;
+  transition:all .2s;
+}
+.review-save-btn:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(139,92,246,0.3);}
+.review-history-item{
+  padding:12px 14px;
+  background:var(--bg);
+  border-radius:var(--radius-sm);
+  margin-bottom:8px;
+  cursor:pointer;
+  transition:all .2s;
+}
+.review-history-item:hover{background:#eef0f3;}
+.review-history-date{font-size:13px;font-weight:700;margin-bottom:2px;}
+.review-history-preview{font-size:12px;color:var(--text-secondary);line-height:1.4;}
+@media(max-width:768px){
+  .kiss-grid{grid-template-columns:1fr;}
+}
+.ci-box svg{opacity:0;transition:opacity .2s;}
+.checklist-item.done .ci-box svg{opacity:1;}
+.ci-text{flex:1;}
+
+/* ========== Tools Grid ========== */
+.tool-card{
+  background:var(--bg);
+  border-radius:var(--radius-sm);
+  padding:16px;
+  text-align:center;
+  transition:all .2s;
+  cursor:pointer;
+}
+.tool-card:hover{transform:translateY(-2px);box-shadow:var(--shadow);}
+.tool-icon{font-size:28px;margin-bottom:8px;}
+.tool-name{font-size:13px;font-weight:600;}
+.tool-desc{font-size:11px;color:var(--text-secondary);margin-top:4px;}
+
+/* ========== Tags ========== */
+.tag{
+  display:inline-block;
+  padding:4px 10px;
+  border-radius:6px;
+  font-size:12px;
+  font-weight:600;
+  margin:2px;
+}
+
+/* ========== Progress ========== */
+.progress-wrap{margin-bottom:14px;}
+.progress-label{
+  display:flex;
+  justify-content:space-between;
+  font-size:13px;
+  margin-bottom:6px;
+}
+.progress-bar{
+  height:8px;
+  background:var(--bg);
+  border-radius:4px;
+  overflow:hidden;
+}
+.progress-fill{
+  height:100%;
+  border-radius:4px;
+  transition:width .5s ease;
+}
+
+/* ========== Section Header ========== */
+.section-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:16px 20px;
+  border-radius:var(--radius);
+  margin-bottom:18px;
+  color:#fff;
+}
+.section-header .sh-icon{font-size:32px;}
+.section-header .sh-title{font-size:20px;font-weight:800;}
+.section-header .sh-sub{font-size:12px;opacity:.85;margin-top:2px;}
+
+/* ========== Note Input ========== */
+.note-input{
+  width:100%;
+  padding:10px 14px;
+  border:2px solid var(--border);
+  border-radius:var(--radius-sm);
+  font-size:14px;
+  outline:none;
+  transition:border-color .2s;
+}
+.note-input:focus{border-color:var(--c-ailearn);}
+
+/* ========== Tip Box ========== */
+.tip-box{
+  background:linear-gradient(135deg,rgba(99,102,241,0.08),rgba(139,92,246,0.08));
+  border-left:3px solid var(--c-ailearn);
+  border-radius:8px;
+  padding:12px 16px;
+  font-size:13px;
+  color:var(--text-primary);
+  line-height:1.6;
+}
+
+/* ========== Link Cards ========== */
+.link-card{
+  display:block;
+  background:var(--bg);
+  border-radius:var(--radius-sm);
+  padding:14px 16px;
+  transition:all .2s;
+  border:1px solid transparent;
+}
+.link-card:hover{
+  transform:translateY(-2px);
+  box-shadow:var(--shadow);
+  border-color:var(--border);
+}
+.link-card .lc-top{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin-bottom:6px;
+}
+.link-card .lc-icon{font-size:22px;}
+.link-card .lc-name{font-size:13px;font-weight:700;}
+.link-card .lc-arrow{margin-left:auto;font-size:14px;color:var(--text-secondary);}
+.link-card .lc-desc{font-size:12px;color:var(--text-secondary);line-height:1.5;}
+.link-card .lc-url{font-size:11px;color:var(--c-ailearn);margin-top:4px;word-break:break-all;}
+
+/* ========== English Phrase System ========== */
+.phrase-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:16px;
+  flex-wrap:wrap;
+  gap:10px;
+}
+.phrase-day-badge{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding:8px 16px;
+  border-radius:20px;
+  background:rgba(34,197,94,0.1);
+  font-size:14px;
+  font-weight:700;
+  color:var(--c-english);
+}
+.phrase-nav{
+  display:flex;
+  gap:8px;
+}
+.phrase-nav button{
+  padding:8px 16px;
+  border-radius:8px;
+  background:var(--bg);
+  font-size:13px;
+  font-weight:600;
+  color:var(--text-primary);
+  transition:all .2s;
+}
+.phrase-nav button:hover{background:#e8e8eb;}
+.phrase-nav button:disabled{opacity:.4;cursor:not-allowed;}
+.phrase-nav button.today-btn{background:var(--c-english);color:#fff;}
+.phrase-nav button.today-btn:hover{background:#16a34a;}
+
+.phrase-progress-bar{
+  height:6px;
+  background:var(--bg);
+  border-radius:3px;
+  overflow:hidden;
+  margin-bottom:16px;
+}
+.phrase-progress-fill{
+  height:100%;
+  background:var(--c-english);
+  border-radius:3px;
+  transition:width .3s ease;
+}
+
+.phrase-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.phrase-item{
+  display:flex;
+  align-items:flex-start;
+  gap:12px;
+  padding:14px 16px;
+  background:var(--bg);
+  border-radius:var(--radius-sm);
+  transition:all .2s;
+}
+.phrase-item:hover{background:#eef0f3;}
+.phrase-item.learned{opacity:.5;}
+.phrase-item.learned .pi-en{text-decoration:line-through;}
+.phrase-num{
+  width:28px;height:28px;
+  border-radius:8px;
+  background:rgba(34,197,94,0.1);
+  color:var(--c-english);
+  font-size:12px;
+  font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.phrase-item.learned .phrase-num{background:var(--c-english);color:#fff;}
+.phrase-content{flex:1;}
+.pi-en{font-size:15px;font-weight:600;line-height:1.4;}
+.pi-cn{font-size:13px;color:var(--text-secondary);margin-top:3px;}
+.pi-cat{
+  display:inline-block;
+  font-size:10px;
+  font-weight:600;
+  padding:2px 8px;
+  border-radius:4px;
+  margin-top:4px;
+  background:rgba(99,102,241,0.08);
+  color:var(--c-ailearn);
+}
+.phrase-check{
+  width:24px;height:24px;
+  border:2px solid #d1d5db;
+  border-radius:6px;
+  flex-shrink:0;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.phrase-check:hover{border-color:var(--c-english);}
+.phrase-item.learned .phrase-check{
+  background:var(--c-english);
+  border-color:var(--c-english);
+}
+.phrase-check svg{opacity:0;transition:opacity .2s;}
+.phrase-item.learned .phrase-check svg{opacity:1;}
+
+.phrase-stats{
+  display:flex;
+  gap:16px;
+  padding:14px 16px;
+  background:var(--bg);
+  border-radius:var(--radius-sm);
+  margin-bottom:14px;
+}
+.phrase-stat{flex:1;text-align:center;}
+.phrase-stat .ps-num{font-size:20px;font-weight:800;color:var(--c-english);}
+.phrase-stat .ps-label{font-size:11px;color:var(--text-secondary);margin-top:2px;}
+
+/* ========== Responsive ========== */
+.mobile-toggle{
+  display:none;
+  position:fixed;
+  top:14px;left:14px;
+  z-index:101;
+  width:44px;height:44px;
+  background:var(--bg-sidebar);
+  border-radius:12px;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  font-size:20px;
+  box-shadow:var(--shadow-lg);
+}
+.sidebar-overlay{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  z-index:99;
+}
+
+@media(max-width:900px){
+  .grid-3,.grid-4{grid-template-columns:repeat(2,1fr);}
+}
+@media(max-width:768px){
+  :root{--sidebar-w:0px;}
+  .sidebar{transform:translateX(-100%);}
+  .sidebar.open{transform:translateX(0);width:260px;}
+  .sidebar.open ~ .sidebar-overlay{display:block;}
+  .mobile-toggle{display:flex;}
+  .main{padding:64px 16px 32px;}
+  .page-title{font-size:22px;}
+  .grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}
+  .donut-wrap{flex-direction:column;align-items:center;}
+  .donut-legend{width:100%;}
+  .timeline-time{width:52px;font-size:11px;}
+  .section-header{flex-wrap:wrap;}
+}
+@media(max-width:480px){
+  html{font-size:14px;}
+  .main{padding:60px 12px 24px;}
+  .card{padding:16px;}
+  .stat-card{padding:14px;}
+}
+
+/* ========== Data Management ========== */
+.dm-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:12px 24px;
+  border:none;
+  border-radius:10px;
+  font-size:14px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all 0.2s;
+  font-family:inherit;
+}
+.dm-btn-primary{background:var(--c-ailearn);color:#fff;}
+.dm-btn-primary:hover{opacity:0.9;transform:translateY(-1px);}
+.dm-btn-secondary{background:#f0f0f0;color:var(--text-primary);}
+.dm-btn-secondary:hover{background:#e5e5e5;}
+.dm-btn-danger{background:#ef4444;color:#fff;}
+.dm-btn-danger:hover{opacity:0.9;}
+.dm-btn-success{background:var(--c-english);color:#fff;}
+
+.dm-status{
+  padding:10px 16px;
+  border-radius:8px;
+  font-size:13px;
+  margin-top:12px;
+  display:none;
+}
+.dm-status.show{display:block;}
+.dm-status.success{background:rgba(34,197,94,0.1);color:#16a34a;}
+.dm-status.error{background:rgba(239,68,68,0.1);color:#dc2626;}
+.dm-status.info{background:rgba(99,102,241,0.1);color:#4f46e5;}
+
+.dm-data-list{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:10px;
+  margin-top:12px;
+}
+.dm-data-item{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:10px 14px;
+  background:#f8f9fa;
+  border-radius:8px;
+  font-size:13px;
+}
+.dm-data-item .dm-di-name{font-weight:600;color:var(--text-primary);}
+.dm-data-item .dm-di-size{color:var(--text-secondary);font-size:11px;}
+
+/* Cloud Sync */
+.cloud-card{
+  border:2px solid #e5e7eb;
+  border-radius:12px;
+  padding:20px;
+  margin-top:16px;
+}
+.cloud-card.connected{border-color:var(--c-english);background:rgba(34,197,94,0.03);}
+.cloud-status-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 12px;
+  border-radius:20px;
+  font-size:12px;
+  font-weight:600;
+}
+.cloud-status-badge.online{background:rgba(34,197,94,0.15);color:#16a34a;}
+.cloud-status-badge.offline{background:rgba(156,163,175,0.15);color:#6b7280;}
+.cloud-status-badge .dot{
+  width:8px;height:8px;border-radius:50%;
+  animation:pulse 2s infinite;
+}
+.cloud-status-badge.online .dot{background:#22c55e;}
+.cloud-status-badge.offline .dot{background:#9ca3af;animation:none;}
+@keyframes pulse{
+  0%,100%{opacity:1;}
+  50%{opacity:0.5;}
+}
+
+.cloud-input-group{
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  margin-bottom:14px;
+}
+.cloud-input-group label{
+  font-size:13px;
+  font-weight:600;
+  color:var(--text-primary);
+}
+.cloud-input-group input{
+  padding:10px 14px;
+  border:1px solid #e5e7eb;
+  border-radius:8px;
+  font-size:14px;
+  font-family:inherit;
+  outline:none;
+  transition:border-color 0.2s;
+}
+.cloud-input-group input:focus{border-color:var(--c-ailearn);}
+
+.cloud-auth-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:8px;
+}
+
+.cloud-user-info{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 16px;
+  background:#f8f9fa;
+  border-radius:8px;
+  margin-bottom:12px;
+}
+.cloud-user-email{font-weight:600;font-size:14px;}
+.cloud-last-sync{font-size:12px;color:var(--text-secondary);margin-top:2px;}
+
+.cloud-sync-log{
+  max-height:200px;
+  overflow-y:auto;
+  padding:10px 14px;
+  background:#f8f9fa;
+  border-radius:8px;
+  font-size:12px;
+  font-family:monospace;
+  margin-top:10px;
+  display:none;
+}
+.cloud-sync-log.show{display:block;}
+.cloud-sync-log .log-entry{
+  padding:4px 0;
+  border-bottom:1px solid #eee;
+}
+.cloud-sync-log .log-entry:last-child{border-bottom:none;}
+
+.cloud-setup-steps{
+  padding:16px;
+  background:rgba(99,102,241,0.05);
+  border-radius:8px;
+  margin-top:12px;
+  font-size:13px;
+  line-height:1.8;
+}
+.cloud-setup-steps ol{margin:0;padding-left:18px;}
+.cloud-setup-steps a{color:var(--c-ailearn);}
+.cloud-setup-steps code{
+  background:#e8e8e8;
+  padding:2px 6px;
+  border-radius:4px;
+  font-size:12px;
+}
+
+/* Hidden file input */
+.file-input-hidden{
+  position:absolute;
+  width:0;height:0;
+  opacity:0;
+  overflow:hidden;
+}
+</style>
+</head>
+<body>
+
+<!-- Mobile Toggle -->
+<button class="mobile-toggle" onclick="toggleSidebar()">&#9776;</button>
+<div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<div class="app">
+
+<!-- ========== Sidebar ========== -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="sidebar-logo">
+      <div class="logo-icon">🎨</div>
+      <div>
+        <div class="logo-text">个人时间规划</div>
+        <div class="logo-sub">全年工作台</div>
+      </div>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-item active" data-page="overview" onclick="navTo('overview')">
+      <span class="nav-dot" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);"></span>
+      <span>总览看板</span>
+      <span class="nav-time">11h</span>
+    </div>
+    <div class="nav-item" data-page="design" onclick="navTo('design')">
+      <span class="nav-dot" style="background:var(--c-design);"></span>
+      <span>AI 设计</span>
+      <span class="nav-time">3.5h</span>
+    </div>
+    <div class="nav-item" data-page="stream" onclick="navTo('stream')">
+      <span class="nav-dot" style="background:var(--c-stream);"></span>
+      <span>直播规划</span>
+      <span class="nav-time">2h</span>
+    </div>
+    <div class="nav-item" data-page="fitness" onclick="navTo('fitness')">
+      <span class="nav-dot" style="background:var(--c-fitness);"></span>
+      <span>健身规划</span>
+      <span class="nav-time">1.5h</span>
+    </div>
+    <div class="nav-item" data-page="dance" onclick="navTo('dance')">
+      <span class="nav-dot" style="background:var(--c-dance);"></span>
+      <span>跳舞训练</span>
+      <span class="nav-time">2h</span>
+    </div>
+    <div class="nav-item" data-page="sing" onclick="navTo('sing')">
+      <span class="nav-dot" style="background:var(--c-sing);"></span>
+      <span>唱歌表演</span>
+      <span class="nav-time">0.5h</span>
+    </div>
+    <div class="nav-item" data-page="english" onclick="navTo('english')">
+      <span class="nav-dot" style="background:var(--c-english);"></span>
+      <span>英语口语</span>
+      <span class="nav-time">0.5h</span>
+    </div>
+    <div class="nav-item" data-page="ailearn" onclick="navTo('ailearn')">
+      <span class="nav-dot" style="background:var(--c-ailearn);"></span>
+      <span>学习 AI 知识</span>
+      <span class="nav-time">1h</span>
+    </div>
+    <div class="nav-item" data-page="review" onclick="navTo('review')">
+      <span class="nav-dot" style="background:#f59e0b;"></span>
+      <span>📝 每日复盘</span>
+      <span class="nav-time">21:00</span>
+    </div>
+    <div class="nav-item" data-page="datasync" onclick="navTo('datasync')">
+      <span class="nav-dot" style="background:#10b981;"></span>
+      <span>☁️ 数据同步</span>
+      <span class="nav-time" id="nav-sync-status">未连接</span>
+    </div>
+  </nav>
+  <div class="sidebar-footer">
+    每日 11h 精进计划<br>v2.0
+  </div>
+</aside>
+
+<!-- ========== Main Content ========== -->
+<main class="main">
+
+<!-- ==================== OVERVIEW ==================== -->
+<section class="page active" id="page-overview">
+  <div class="page-header">
+    <div>
+      <div class="page-title"><span class="emoji">📊</span>总览看板</div>
+      <div class="page-subtitle">每日时间分配总览 · 7大模块 · 11小时精进计划 · 每日复盘</div>
+    </div>
+    <div class="page-badge" style="background:linear-gradient(135deg,#8b5cf6,#ec4899);">今日计划</div>
+  </div>
+
+  <!-- Weather Module -->
+  <div class="weather-card" id="weather-card">
+    <div class="weather-header">
+      <div class="weather-title">🌤️ 实时天气 · 深圳</div>
+      <div class="weather-update">
+        <span id="weather-last-update">正在更新...</span>
+        <button onclick="refreshWeather()" style="background:rgba(255,255,255,0.15);border:none;border-radius:6px;padding:4px 10px;color:#fff;font-size:11px;cursor:pointer;">🔄 刷新</button>
+      </div>
+    </div>
+    <div class="weather-grid" id="weather-grid">
+      <div class="weather-loading">正在获取天气数据...</div>
+    </div>
+  </div>
+
+  <!-- Compact Stats Bar -->
+  <div class="stats-bar">
+    <div class="stats-bar-item">
+      <div class="sbi-icon" style="background:rgba(139,92,246,0.12);">⏰</div>
+      <div class="sbi-text">
+        <div class="sbi-num">11h</div>
+        <div class="sbi-label">每日精进总时长</div>
+      </div>
+    </div>
+    <div class="stats-bar-item">
+      <div class="sbi-icon" style="background:rgba(99,102,241,0.12);">😴</div>
+      <div class="sbi-text">
+        <div class="sbi-num">7-8h</div>
+        <div class="sbi-label">睡眠保障（固定）</div>
+      </div>
+    </div>
+    <div class="stats-bar-item">
+      <div class="sbi-icon" style="background:rgba(236,72,153,0.12);">🎯</div>
+      <div class="sbi-text">
+        <div class="sbi-num">7</div>
+        <div class="sbi-label">核心模块</div>
+      </div>
+    </div>
+    <div class="stats-bar-item">
+      <div class="sbi-icon" style="background:rgba(34,197,94,0.12);">🔋</div>
+      <div class="sbi-text">
+        <div class="sbi-num">5h</div>
+        <div class="sbi-label">餐饮休息弹性</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Daily Timeline + Live Status -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">📅 每日时间轴 <span style="font-size:11px;font-weight:500;color:var(--text-secondary);margin-left:8px;">点击圆点标记完成 · 长按可调整时间</span></div>
+      <div class="timeline" id="overview-timeline">
+        <div class="timeline-item" data-task="english" data-start="07:00" data-duration="30">
+          <div class="timeline-time">07:00</div>
+          <div class="timeline-bar" style="background:var(--c-english);"></div>
+          <div class="timeline-content">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="tl-check" onclick="toggleTimelineTask(this,'english')" title="标记完成/未完成"></div>
+              <div><div class="tc-name">🇬🇧 英语口语练习</div><div class="tc-desc">晨间大脑活跃，语言学习黄金期</div></div>
+            </div>
+            <div class="tc-duration" style="background:var(--c-english);">30min</div>
+          </div>
+        </div>
+        <div class="timeline-item" data-task="sing" data-start="07:30" data-duration="30">
+          <div class="timeline-time">07:30</div>
+          <div class="timeline-bar" style="background:var(--c-sing);"></div>
+          <div class="timeline-content">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="tl-check" onclick="toggleTimelineTask(this,'sing')" title="标记完成/未完成"></div>
+              <div><div class="tc-name">🎤 唱歌练声</div><div class="tc-desc">晨间开嗓，声乐基础热身</div></div>
+            </div>
+            <div class="tc-duration" style="background:var(--c-sing);">30min</div>
+          </div>
+        </div>
+        <div class="timeline-item" data-task="design" data-start="08:30" data-duration="210">
+          <div class="timeline-time">08:30</div>
+          <div class="timeline-bar" style="background:var(--c-design);"></div>
+          <div class="timeline-content">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="tl-check" onclick="toggleTimelineTask(this,'design')" title="标记完成/未完成"></div>
+              <div><div class="tc-name">🎨 设计工作</div><div class="tc-desc">上午专注力峰值，创意产出最佳时段</div></div>
+            </div>
+            <div class="tc-duration" style="background:var(--c-design);">3.5h</div>
+          </div>
+        </div>
+        <div class="timeline-item" data-task="fitness" data-start="13:00" data-duration="90">
+          <div class="timeline-time">13:00</div>
+          <div class="timeline-bar" style="background:var(--c-fitness);"></div>
+          <div class="timeline-content">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="tl-check" onclick="toggleTimelineTask(this,'fitness')" title="标记完成/未完成"></div>
+              <div><div class="tc-name">💪 健身训练</div><div class="tc-desc">午后运动激活身体，提升全天精力</div></div>
+            </div>
+            <div class="tc-duration" style="background:var(--c-fitness);">1.5h</div>
+          </div>
+        </div>
+        <div class="timeline-item" data-task="ailearn" data-start="15:00" data-duration="60">
+          <div class="timeline-time">15:00</div>
+          <div class="timeline-bar" style="background:var(--c-ailearn);"></div>
+          <div class="timeline-content">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="tl-check" onclick="toggleTimelineTask(this,'ailearn')" title="标记完成/未完成"></div>
+              <div><div class="tc-name">🤖 学习 AI 知识</div><div class="tc-desc">午休后学习时段，吸收新知识</div></div>
+            </div>
+            <div class="tc-duration" style="background:var(--c-ailearn);">1h</div>
+          </div>
+        </div>
+        <div class="timeline-item" data-task="dance" data-start="16:00" data-duration="120">
+          <div class="timeline-time">16:00</div>
+          <div class="timeline-bar" style="background:var(--c-dance);"></div>
+          <div class="timeline-content">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="tl-check" onclick="toggleTimelineTask(this,'dance')" title="标记完成/未完成"></div>
+              <div><div class="tc-name">💃 跳舞训练</div><div class="tc-desc">体力充沛时段，舞蹈编排与练习</div></div>
+            </div>
+            <div class="tc-duration" style="background:var(--c-dance);">2h</div>
+          </div>
+        </div>
+        <div class="timeline-item" data-task="stream" data-start="19:00" data-duration="120">
+          <div class="timeline-time">19:00</div>
+          <div class="timeline-bar" style="background:var(--c-stream);"></div>
+          <div class="timeline-content">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="tl-check" onclick="toggleTimelineTask(this,'stream')" title="标记完成/未完成"></div>
+              <div><div class="tc-name">📺 直播</div><div class="tc-desc">晚间黄金时段，观众活跃度最高</div></div>
+            </div>
+            <div class="tc-duration" style="background:var(--c-stream);">2h</div>
+          </div>
+        </div>
+        <div class="timeline-item" data-task="sleep" data-start="23:00" data-duration="480">
+          <div class="timeline-time" style="color:#6b7280;">23:00</div>
+          <div class="timeline-bar" style="background:#374151;opacity:.4;"></div>
+          <div class="timeline-content" style="background:rgba(55,65,81,0.06);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="tl-check" onclick="toggleTimelineTask(this,'sleep')" title="标记完成/未完成"></div>
+              <div><div class="tc-name" style="color:#6b7280;">😴 睡眠</div><div class="tc-desc">固定 7-8 小时 · 23:00 入睡 · 保证恢复</div></div>
+            </div>
+            <div class="tc-duration" style="background:#374151;opacity:.5;">7-8h</div>
+          </div>
+        </div>
+        <div class="timeline-item" data-task="review" data-start="21:00" data-duration="30">
+          <div class="timeline-time">21:00</div>
+          <div class="timeline-bar" style="background:#f59e0b;"></div>
+          <div class="timeline-content">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="tl-check" onclick="toggleTimelineTask(this,'review')" title="标记完成/未完成"></div>
+              <div><div class="tc-name">📝 每日复盘</div><div class="tc-desc">KISS 日常复盘 + GRAI 重大复盘</div></div>
+            </div>
+            <div class="tc-duration" style="background:#f59e0b;">30min</div>
+          </div>
+        </div>
+      </div>
+      <!-- Timeline summary bar -->
+      <div style="margin-top:14px;padding:12px 16px;background:var(--bg);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text-secondary);">📊 今日完成情况</div>
+        <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+          <span id="tl-completed-count" style="font-size:13px;">已完成 0 / 9 项</span>
+          <div style="width:120px;"><div class="progress-bar"><div class="progress-fill" id="tl-progress-fill" style="width:0%;background:linear-gradient(90deg,#8b5cf6,#ec4899);"></div></div></div>
+          <span id="tl-progress-pct" style="font-size:13px;font-weight:700;">0%</span>
+          <button onclick="adjustUncompletedTasks()" style="background:rgba(245,158,11,0.12);color:#d97706;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">⏰ 调整未完成项</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⏱️ 当前状态</div>
+      <div style="text-align:center;padding:20px 0 14px;background:linear-gradient(135deg,rgba(139,92,246,0.08),rgba(236,72,153,0.08));border-radius:var(--radius-sm);margin-bottom:16px;">
+        <div style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">当前时间</div>
+        <div id="live-clock" style="font-size:36px;font-weight:800;letter-spacing:1px;color:var(--text-primary);">--:--</div>
+        <div id="live-date" style="font-size:12px;color:var(--text-secondary);margin-top:4px;">--</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="padding:14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">当前 / 下一项</div>
+          <div id="live-activity" style="font-size:15px;font-weight:700;color:var(--c-design);">正在计算...</div>
+          <div id="live-activity-time" style="font-size:12px;color:var(--text-secondary);margin-top:2px;">--</div>
+        </div>
+        <div style="padding:14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">今日完成进度</div>
+          <div class="progress-bar" style="margin-top:6px;"><div class="progress-fill" id="overview-progress" style="width:0%;background:linear-gradient(90deg,#8b5cf6,#ec4899);"></div></div>
+          <div id="overview-progress-text" style="font-size:12px;font-weight:600;text-align:right;margin-top:6px;">0%</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Today's Checklist -->
+  <div class="card">
+    <div class="card-title">✅ 今日任务清单</div>
+    <div class="checklist" id="overview-checklist">
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">07:00 英语口语 — 晨间跟读练习 30 分钟</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">07:30 唱歌练声 — 气息控制 + 音阶热身 30 分钟</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">08:30 设计工作 — 今日设计任务 3.5 小时</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">13:00 健身训练 — 今日训练计划 1.5 小时</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">15:00 AI 学习 — 阅读教程 / 实践练习 1 小时</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">16:00 跳舞训练 — 舞蹈编排 + 反复练习 2 小时</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">19:00 直播 — 互动聊天 + 才艺展示 2 小时</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this);navTo('review')"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">21:00 每日复盘 — KISS + GRAI 结构化复盘（点击进入复盘页面）</span></div>
+    </div>
+  </div>
+
+  <!-- Time Donut (moved to end, smaller) -->
+  <div class="card" style="opacity:.95;">
+    <div class="card-title">🕐 每日时间分配 <span style="font-size:12px;font-weight:500;color:var(--text-secondary);margin-left:8px;">仅供参考 · 24小时全景</span></div>
+    <div class="donut-wrap">
+      <div class="donut-chart">
+        <svg width="200" height="200" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#f0f0f0" stroke-width="24"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#8b5cf6" stroke-width="24" stroke-dasharray="73.3 429.35" stroke-dashoffset="0"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#ec4899" stroke-width="24" stroke-dasharray="41.9 460.75" stroke-dashoffset="-73.3"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#f97316" stroke-width="24" stroke-dasharray="31.4 471.25" stroke-dashoffset="-115.2"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#3b82f6" stroke-width="24" stroke-dasharray="41.9 460.75" stroke-dashoffset="-146.6"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#14b8a6" stroke-width="24" stroke-dasharray="10.5 492.15" stroke-dashoffset="-188.5"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#22c55e" stroke-width="24" stroke-dasharray="10.5 492.15" stroke-dashoffset="-199"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#6366f1" stroke-width="24" stroke-dasharray="20.9 481.75" stroke-dashoffset="-209.5"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#374151" stroke-width="24" stroke-dasharray="167.5 335.15" stroke-dashoffset="-230.4" opacity="0.3"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#9ca3af" stroke-width="24" stroke-dasharray="104.7 397.95" stroke-dashoffset="-397.9" opacity="0.2"/>
+        </svg>
+        <div class="donut-center">
+          <div class="num">11h</div>
+          <div class="label">每日精进</div>
+        </div>
+      </div>
+      <div class="donut-legend">
+        <div class="legend-item"><span class="legend-dot" style="background:#8b5cf6;"></span><span class="legend-name">AI 设计</span><span class="legend-time">3.5h</span><span class="legend-pct">14.6%</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#ec4899;"></span><span class="legend-name">直播</span><span class="legend-time">2h</span><span class="legend-pct">8.3%</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#f97316;"></span><span class="legend-name">健身</span><span class="legend-time">1.5h</span><span class="legend-pct">6.3%</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#3b82f6;"></span><span class="legend-name">跳舞</span><span class="legend-time">2h</span><span class="legend-pct">8.3%</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#14b8a6;"></span><span class="legend-name">唱歌</span><span class="legend-time">0.5h</span><span class="legend-pct">2.1%</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#22c55e;"></span><span class="legend-name">英语</span><span class="legend-time">0.5h</span><span class="legend-pct">2.1%</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#6366f1;"></span><span class="legend-name">AI 学习</span><span class="legend-time">1h</span><span class="legend-pct">4.2%</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#374151;opacity:.4;"></span><span class="legend-name">睡眠（固定）</span><span class="legend-time">7-8h</span><span class="legend-pct">~31%</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#9ca3af;opacity:.3;"></span><span class="legend-name">餐饮休息</span><span class="legend-time">5h</span><span class="legend-pct">20.8%</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    💡 <b>时间规划核心思路：</b>脑力任务（设计、英语、AI学习）安排在上午，体力任务（健身、跳舞）放下午，社交任务（直播）放晚间黄金时段。睡眠固定 7-8 小时（23:00-07:00）。每日 21:00 进行 KISS + GRAI 复盘，未完成任务可延后或调整时间。
+  </div>
+</section>
+
+<!-- ==================== AI DESIGN ==================== -->
+<section class="page" id="page-design">
+  <div class="section-header" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);">
+    <div class="sh-icon">🎨</div>
+    <div>
+      <div class="sh-title">AI 设计</div>
+      <div class="sh-sub">每日 08:30 - 12:00 · 3.5 小时 · 创意产出核心时段</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🎯 今日设计目标</div>
+      <div class="checklist">
+        <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">梳理今日设计需求清单，明确优先级</span></div>
+        <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">前 1h：用 AI 工具快速生成设计草图/灵感参考</span></div>
+        <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">中 2h：精修设计稿，完成主要交付物</span></div>
+        <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">后 0.5h：整理文件、归档素材、记录复盘</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🛠️ AI 设计工具推荐</div>
+      <div class="grid-2" style="gap:12px;">
+        <a class="link-card" href="https://www.midjourney.com" target="_blank">
+          <div class="lc-top"><span class="lc-icon">🎨</span><span class="lc-name">Midjourney</span><span class="lc-arrow">↗</span></div>
+          <div class="lc-desc">AI 绘画神器，输入文字描述生成高质量图片，适合灵感发散和概念图生成</div>
+          <div class="lc-url">midjourney.com</div>
+        </a>
+        <a class="link-card" href="https://stability.ai" target="_blank">
+          <div class="lc-top"><span class="lc-icon">🖼️</span><span class="lc-name">Stable Diffusion</span><span class="lc-arrow">↗</span></div>
+          <div class="lc-desc">开源 AI 生图工具，可本地部署，支持风格迁移、图生图、ControlNet 精确控制</div>
+          <div class="lc-url">stability.ai</div>
+        </a>
+        <a class="link-card" href="https://www.figma.com" target="_blank">
+          <div class="lc-top"><span class="lc-icon">📐</span><span class="lc-name">Figma</span><span class="lc-arrow">↗</span></div>
+          <div class="lc-desc">在线协作设计工具，支持 UI/UX 设计、原型交互，Figma AI 可快速生成设计方案</div>
+          <div class="lc-url">figma.com</div>
+        </a>
+        <a class="link-card" href="https://www.canva.com" target="_blank">
+          <div class="lc-top"><span class="lc-icon">✨</span><span class="lc-name">Canva AI</span><span class="lc-arrow">↗</span></div>
+          <div class="lc-desc">在线设计平台，AI 一键生成海报/社交媒体图/直播封面，海量模板可直接使用</div>
+          <div class="lc-url">canva.com</div>
+        </a>
+        <a class="link-card" href="https://www.adobe.com/products/photoshop.html" target="_blank">
+          <div class="lc-top"><span class="lc-icon">🎭</span><span class="lc-name">Photoshop AI</span><span class="lc-arrow">↗</span></div>
+          <div class="lc-desc">Adobe Photoshop 创意填充（Generative Fill），AI 修图、扩展画面、智能移除物体</div>
+          <div class="lc-url">adobe.com/photoshop</div>
+        </a>
+        <a class="link-card" href="https://www.workbuddy.cn" target="_blank">
+          <div class="lc-top"><span class="lc-icon">🤖</span><span class="lc-name">WorkBuddy</span><span class="lc-arrow">↗</span></div>
+          <div class="lc-desc">AI 助手，辅助设计方案生成、文案撰写、创意brainstorm，支持多轮对话迭代</div>
+          <div class="lc-url">workbuddy.cn</div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔗 设计灵感 & 素材资源</div>
+    <div class="grid-4">
+      <a class="link-card" href="https://dribbble.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🏀</span><span class="lc-name">Dribbble</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">设计师作品分享社区</div>
+      </a>
+      <a class="link-card" href="https://www.behance.net" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🅱️</span><span class="lc-name">Behance</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">Adobe 旗下创意作品平台</div>
+      </a>
+      <a class="link-card" href="https://www.pinterest.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">📌</span><span class="lc-name">Pinterest</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">视觉灵感收集与 mood board</div>
+      </a>
+      <a class="link-card" href="https://unsplash.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">📷</span><span class="lc-name">Unsplash</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">免费高清图片素材库</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📈 设计能力成长路线</div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>视觉设计基础</span><span>持续精进</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:75%;background:var(--c-design);"></div></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>AI 工具熟练度</span><span>快速提升中</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:55%;background:var(--c-design);"></div></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>品牌设计能力</span><span>拓展中</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:40%;background:var(--c-design);"></div></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>动效 / 3D 设计</span><span>入门阶段</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:20%;background:var(--c-design);"></div></div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    💡 <b>效率建议：</b>用 AI 工具做「灵感发散 → 快速草图」阶段，人工专注「精修打磨 → 品控交付」。前 30 分钟集中用 AI 生成多方案参考，后 3 小时深入打磨最优方案。
+  </div>
+</section>
+
+<!-- ==================== STREAM ==================== -->
+<section class="page" id="page-stream">
+  <div class="section-header" style="background:linear-gradient(135deg,#ec4899,#db2777);">
+    <div class="sh-icon">📺</div>
+    <div>
+      <div class="sh-title">直播规划</div>
+      <div class="sh-sub">每日 19:00 - 21:00 · 2 小时 · 晚间黄金时段</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">📋 直播前准备清单</div>
+      <div class="checklist">
+        <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">检查灯光：主光 + 辅光 + 背景光调试</span></div>
+        <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">检查音频：麦克风测试 + 背景音乐音量</span></div>
+        <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">整理直播背景：整洁 / 主题装饰</span></div>
+        <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">准备话题清单：5-8 个互动话题</span></div>
+        <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">才艺准备：歌曲 / 舞蹈片段排练</span></div>
+        <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">预热发帖：提前 1h 发布开播预告</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🗓️ 每周直播主题</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-stream);width:50px;">周一</span>
+          <span>设计分享 + 互动聊天</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-stream);width:50px;">周二</span>
+          <span>唱歌专场 + 点歌互动</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-stream);width:50px;">周三</span>
+          <span>跳舞表演 + 教学互动</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-stream);width:50px;">周四</span>
+          <span>AI 工具演示 + 知识分享</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-stream);width:50px;">周五</span>
+          <span>才艺综合秀 + 粉丝互动</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-stream);width:50px;">周六</span>
+          <span>主题专场（每周不同）</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-stream);width:50px;">周日</span>
+          <span>休息 / 特别企划</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">💬 直播互动话术库</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;">
+      <span class="tag" style="background:rgba(236,72,153,0.1);color:#ec4899;">欢迎新观众："欢迎来到直播间～先点个关注不迷路哦"</span>
+      <span class="tag" style="background:rgba(236,72,153,0.1);color:#ec4899;">引导互动："大家想听什么歌？弹幕告诉我～"</span>
+      <span class="tag" style="background:rgba(236,72,153,0.1);color:#ec4899;">才艺过渡："接下来给大家表演一段舞蹈，准备好了吗？"</span>
+      <span class="tag" style="background:rgba(236,72,153,0.1);color:#ec4899;">感谢打赏："感谢XX的礼物！太感谢了💕"</span>
+      <span class="tag" style="background:rgba(236,72,153,0.1);color:#ec4899;">留存话术："稍后有精彩内容，别走开哦～"</span>
+      <span class="tag" style="background:rgba(236,72,153,0.1);color:#ec4899;">下播预告："明天X点开播，记得来哦！"</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📱 直播平台 & 工具</div>
+    <div class="grid-4">
+      <a class="link-card" href="https://www.douyin.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🎵</span><span class="lc-name">抖音直播</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">流量最大的短视频/直播平台</div>
+      </a>
+      <a class="link-card" href="https://live.bilibili.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">📺</span><span class="lc-name">B站直播</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">二次元/才艺/知识类直播</div>
+      </a>
+      <a class="link-card" href="https://www.kuaishou.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">快手</span><span class="lc-name">快手直播</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">下沉市场直播平台</div>
+      </a>
+      <a class="link-card" href="https://www.xiaohongshu.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">📕</span><span class="lc-name">小红书</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">种草/生活方式/设计分享</div>
+      </a>
+      <a class="link-card" href="https://obsproject.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🎥</span><span class="lc-name">OBS Studio</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">免费开源直播推流软件，电脑端直播必备</div>
+      </a>
+      <a class="link-card" href="https://www.canva.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🎨</span><span class="lc-name">Canva</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">制作直播封面、公告栏、贴纸素材</div>
+      </a>
+      <a class="link-card" href="https://www.douyin.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">📊</span><span class="lc-name">蝉妈妈</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">直播数据分析、竞品监测、选品参考</div>
+      </a>
+      <a class="link-card" href="https://www.xiaohongshu.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">💡</span><span class="lc-name">剪映</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">短视频剪辑，直播切片制作</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    💡 <b>直播效率建议：</b>2 小时直播建议分为 4 个 30 分钟段落 —— 开场暖场(30min) → 互动聊天(30min) → 才艺展示(30min) → 高潮互动+下播预告(30min)。利用设计技能制作专属直播间视觉素材，打造差异化人设。
+  </div>
+</section>
+
+<!-- ==================== FITNESS ==================== -->
+<section class="page" id="page-fitness">
+  <div class="section-header" style="background:linear-gradient(135deg,#f97316,#ea580c);">
+    <div class="sh-icon">💪</div>
+    <div>
+      <div class="sh-title">健身规划</div>
+      <div class="sh-sub">每日 13:00 - 14:30 · 1.5 小时 · 午后精力激活</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🏋️ 每周训练计划</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-fitness);width:50px;">周一</span>
+          <span>上肢训练（胸 + 三头）</span>
+          <span style="margin-left:auto;font-size:12px;color:var(--text-secondary);">60min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-fitness);width:50px;">周二</span>
+          <span>有氧 + 核心（跑步 + 腹肌）</span>
+          <span style="margin-left:auto;font-size:12px;color:var(--text-secondary);">60min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-fitness);width:50px;">周三</span>
+          <span>下肢训练（腿 + 臀）</span>
+          <span style="margin-left:auto;font-size:12px;color:var(--text-secondary);">60min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-fitness);width:50px;">周四</span>
+          <span>上肢训练（背 + 二头）</span>
+          <span style="margin-left:auto;font-size:12px;color:var(--text-secondary);">60min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-fitness);width:50px;">周五</span>
+          <span>有氧 + 柔韧性（瑜伽拉伸）</span>
+          <span style="margin-left:auto;font-size:12px;color:var(--text-secondary);">60min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-fitness);width:50px;">周六</span>
+          <span>全身 HIIT 间歇训练</span>
+          <span style="margin-left:auto;font-size:12px;color:var(--text-secondary);">45min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-fitness);width:50px;">周日</span>
+          <span>休息 / 轻度拉伸恢复</span>
+          <span style="margin-left:auto;font-size:12px;color:var(--text-secondary);">30min</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">⏱️ 每次训练结构（90分钟）</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(249,115,22,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">🔥</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">热身激活</div><div style="font-size:12px;color:var(--text-secondary);">动态拉伸 + 关节激活</div></div>
+          <span style="font-weight:700;color:var(--c-fitness);">15min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(249,115,22,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">💪</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">核心训练</div><div style="font-size:12px;color:var(--text-secondary);">主项训练 4-5 组</div></div>
+          <span style="font-weight:700;color:var(--c-fitness);">50min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(249,115,22,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">🫁</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">有氧收尾</div><div style="font-size:12px;color:var(--text-secondary);">跑步 / 跳绳 15-20min</div></div>
+          <span style="font-weight:700;color:var(--c-fitness);">15min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(249,115,22,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">🧘</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">拉伸放松</div><div style="font-size:12px;color:var(--text-secondary);">静态拉伸 + 泡沫轴</div></div>
+          <span style="font-weight:700;color:var(--c-fitness);">10min</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📊 健身目标追踪</div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>每周训练完成率</span><span>目标 6/7 天</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:85%;background:var(--c-fitness);"></div></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>体态改善进度</span><span>持续中</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:60%;background:var(--c-fitness);"></div></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>力量提升（卧推/深蹲）</span><span>稳步增长</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:45%;background:var(--c-fitness);"></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔗 健身学习资源 & APP</div>
+    <div class="grid-4">
+      <a class="link-card" href="https://www.keep.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🏃</span><span class="lc-name">Keep</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">健身训练 APP，海量课程跟练，含力量/有氧/瑜伽</div>
+      </a>
+      <a class="link-card" href="https://www.bilibili.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">📺</span><span class="lc-name">B站健身区</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">搜索"健身教程"，大量免费训练视频</div>
+      </a>
+      <a class="link-card" href="https://www.boohee.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🥗</span><span class="lc-name">薄荷健康</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">饮食记录与热量管理，配合健身效果加倍</div>
+      </a>
+      <a class="link-card" href="https://www.youtube.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">💪</span><span class="lc-name">帕梅拉/周六野</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">YouTube/B站搜索跟练视频，适合居家训练</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    💡 <b>健身与主播职业结合：</b>健身不仅提升体态和镜头表现力，跳舞和直播也需要良好的体能支撑。力量训练提升舞蹈爆发力，有氧训练增强直播续航能力。午后 13:00 训练能有效对抗饭后困倦。
+  </div>
+</section>
+
+<!-- ==================== DANCE ==================== -->
+<section class="page" id="page-dance">
+  <div class="section-header" style="background:linear-gradient(135deg,#3b82f6,#2563eb);">
+    <div class="sh-icon">💃</div>
+    <div>
+      <div class="sh-title">跳舞训练</div>
+      <div class="sh-sub">每日 16:00 - 18:00 · 2 小时 · 体力充沛时段</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🎯 训练结构（120分钟）</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(59,130,246,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">🔥</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">热身 + 基本功</div><div style="font-size:12px;color:var(--text-secondary);">身体激活 + 基础步伐 / 律动练习</div></div>
+          <span style="font-weight:700;color:var(--c-dance);">20min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(59,130,246,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">🎵</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">编舞学习</div><div style="font-size:12px;color:var(--text-secondary);">学习新编排 / 分解动作练习</div></div>
+          <span style="font-weight:700;color:var(--c-dance);">50min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(59,130,246,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">🔁</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">反复练习</div><div style="font-size:12px;color:var(--text-secondary);">完整跟音乐练习 + 录视频复盘</div></div>
+          <span style="font-weight:700;color:var(--c-dance);">35min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(59,130,246,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">🧘</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">拉伸放松</div><div style="font-size:12px;color:var(--text-secondary);">肌肉拉伸 + 防止受伤</div></div>
+          <span style="font-weight:700;color:var(--c-dance);">15min</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💃 舞种学习路线</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="padding:12px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-weight:700;font-size:14px;">Jazz 爵士舞</span>
+            <span style="font-size:12px;color:var(--c-dance);font-weight:600;">主攻方向</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-secondary);">性感律动 + 表现力，适合直播表演</div>
+          <div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:65%;background:var(--c-dance);"></div></div>
+        </div>
+        <div style="padding:12px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-weight:700;font-size:14px;">K-Pop Cover</span>
+            <span style="font-size:12px;color:var(--c-dance);font-weight:600;">热门方向</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-secondary);">流行韩舞翻跳，粉丝喜爱度高</div>
+          <div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:50%;background:var(--c-dance);"></div></div>
+        </div>
+        <div style="padding:12px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-weight:700;font-size:14px;">Urban / 编舞</span>
+            <span style="font-size:12px;color:var(--c-dance);font-weight:600;">进阶方向</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-secondary);">故事性编舞，展现创意与设计感</div>
+          <div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:30%;background:var(--c-dance);"></div></div>
+        </div>
+        <div style="padding:12px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-weight:700;font-size:14px;">Hip-Hop 基础</span>
+            <span style="font-size:12px;color:var(--c-dance);font-weight:600;">基础打底</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-secondary);">律动基础，提升整体舞蹈质感</div>
+          <div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:70%;background:var(--c-dance);"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📝 本周舞蹈任务</div>
+    <div class="checklist">
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">完成 1 支新舞完整学习并录制视频</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">复习 2 支已学舞蹈，提升完成度</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">每天录制练习视频，对比复盘动作细节</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">挑选 1 支成品舞用于本周直播表演</span></div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    💡 <b>舞蹈 + 直播联动：</b>每周选 1 支精修舞蹈作为直播才艺展示，用设计能力制作舞蹈短视频封面和直播预告海报，形成"训练→录制→直播→涨粉"闭环。录像复盘是提升最快的方法。
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔗 舞蹈学习资源</div>
+    <div class="grid-4">
+      <a class="link-card" href="https://www.bilibili.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">📺</span><span class="lc-name">B站舞蹈区</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">大量舞蹈教程、分解教学、镜面翻转视频</div>
+      </a>
+      <a class="link-card" href="https://www.youtube.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🎥</span><span class="lc-name">YouTube 1M舞室</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">搜索 "1MILLION Dance Studio"，顶级编舞教学</div>
+      </a>
+      <a class="link-card" href="https://www.youtube.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🎬</span><span class="lc-name">STEEZY Studio</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">在线舞蹈课程平台，多角度教学+慢速分解</div>
+      </a>
+      <a class="link-card" href="https://www.douyin.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🎵</span><span class="lc-name">抖音舞蹈</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">热门舞蹈挑战，跟拍+传播</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== SING ==================== -->
+<section class="page" id="page-sing">
+  <div class="section-header" style="background:linear-gradient(135deg,#14b8a6,#0d9488);">
+    <div class="sh-icon">🎤</div>
+    <div>
+      <div class="sh-title">唱歌表演</div>
+      <div class="sh-sub">每日 07:30 - 08:00 · 30 分钟 · 晨间开嗓热身</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🎵 30 分钟练声结构</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(20,184,166,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">🌬️</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">气息练习</div><div style="font-size:12px;color:var(--text-secondary);">腹式呼吸 + 长音控制</div></div>
+          <span style="font-weight:700;color:var(--c-sing);">8min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(20,184,166,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">🎹</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">音阶热身</div><div style="font-size:12px;color:var(--text-secondary);">爬音阶 + 咬字练习</div></div>
+          <span style="font-weight:700;color:var(--c-sing);">7min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(20,184,166,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">🎶</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">歌曲练习</div><div style="font-size:12px;color:var(--text-secondary);">精练 1 首 / 磨合细节</div></div>
+          <span style="font-weight:700;color:var(--c-sing);">15min</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📋 直播歌单管理</div>
+      <div style="display:flex;flex-direction:column;gap:6px;">
+        <div style="padding:8px 14px;background:var(--bg);border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;">🎵 拿手曲目（稳定可唱）</span>
+          <span style="font-size:12px;font-weight:700;color:var(--c-sing);">8 首</span>
+        </div>
+        <div style="padding:8px 14px;background:var(--bg);border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;">🔄 练习中（需打磨）</span>
+          <span style="font-size:12px;font-weight:700;color:var(--c-sing);">5 首</span>
+        </div>
+        <div style="padding:8px 14px;background:var(--bg);border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;">📝 待学习（新歌计划）</span>
+          <span style="font-size:12px;font-weight:700;color:var(--c-sing);">3 首</span>
+        </div>
+        <div style="padding:8px 14px;background:var(--bg);border-radius:8px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:13px;">⭐ 粉丝点歌热门</span>
+          <span style="font-size:12px;font-weight:700;color:var(--c-sing);">需更新</span>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <input class="note-input" placeholder="添加新歌到歌单..." onkeydown="if(event.key==='Enter')addSong(this)">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📈 唱歌能力成长</div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>音准控制</span><span>良好</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:70%;background:var(--c-sing);"></div></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>气息稳定性</span><span>提升中</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:55%;background:var(--c-sing);"></div></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>音域拓展</span><span>持续练习</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:40%;background:var(--c-sing);"></div></div>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-label"><span>情感表达</span><span>进步明显</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:60%;background:var(--c-sing);"></div></div>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    💡 <b>唱歌 + 直播联动：</b>晨间 30 分钟以基础练声为主（不追求量，追求质），直播时的演唱才是实战检验。每周更新 1 首新歌到直播歌单，保持新鲜感。用录音对比复盘进步。
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔗 声乐学习资源 & 工具</div>
+    <div class="grid-4">
+      <a class="link-card" href="https://www.bilibili.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">📺</span><span class="lc-name">B站声乐教程</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">搜索"声乐教学""唱歌技巧"，大量免费教程</div>
+      </a>
+      <a class="link-card" href="https://www.youtube.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🎤</span><span class="lc-name">YouTube声乐课</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">搜索 "vocal exercises" "singing lessons"</div>
+      </a>
+      <a class="link-card" href="https://www.kugou.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🎵</span><span class="lc-name">全民K歌</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">在线练歌，评分系统帮助检测音准</div>
+      </a>
+      <a class="link-card" href="https://www.tan8.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🎹</span><span class="lc-name">弹琴吧</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">钢琴/吉他伴奏，辅助练唱</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== ENGLISH ==================== -->
+<section class="page" id="page-english">
+  <div class="section-header" style="background:linear-gradient(135deg,#22c55e,#16a34a);">
+    <div class="sh-icon">🇬🇧</div>
+    <div>
+      <div class="sh-title">英语口语</div>
+      <div class="sh-sub">每日 07:00 - 07:30 · 30 分钟 · 晨间语言黄金期</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🗣️ 30 分钟练习结构</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(34,197,94,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">👂</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">听力输入</div><div style="font-size:12px;color:var(--text-secondary);">听一段对话 / 播客片段</div></div>
+          <span style="font-weight:700;color:var(--c-english);">10min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(34,197,94,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">📢</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">跟读模仿</div><div style="font-size:12px;color:var(--text-secondary);">逐句跟读，模仿语调语速</div></div>
+          <span style="font-weight:700;color:var(--c-english);">12min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(34,197,94,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">💬</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">自由输出</div><div style="font-size:12px;color:var(--text-secondary);">用英语复述 / 自言自语</div></div>
+          <span style="font-weight:700;color:var(--c-english);">8min</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">📚 每周主题计划</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-english);width:50px;">周一</span>
+          <span>日常生活对话</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-english);width:50px;">周二</span>
+          <span>设计专业英语</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-english);width:50px;">周三</span>
+          <span>直播 / 社交英语</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-english);width:50px;">周四</span>
+          <span>流行文化 / 影视片段</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-english);width:50px;">周五</span>
+          <span>AI / 科技话题</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-english);width:50px;">周六</span>
+          <span>英文歌曲学唱</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <span style="font-weight:700;color:var(--c-english);width:50px;">周日</span>
+          <span>复习 + 自由对话</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🛠️ 推荐练习工具</div>
+    <div class="grid-4">
+      <a class="link-card" href="https://www.workbuddy.cn" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🤖</span><span class="lc-name">WorkBuddy AI 对话</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">直接用英语和 AI 对话练习，可指定场景角色扮演</div>
+      </a>
+      <a class="link-card" href="https://www.bbc.co.uk/learningenglish" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🎧</span><span class="lc-name">BBC Learning English</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">BBC 官方英语学习，每日更新听力材料+文字稿</div>
+      </a>
+      <a class="link-card" href="https://www.duolingo.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">📱</span><span class="lc-name">多邻国 Duolingo</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">游戏化英语学习 APP，碎片时间练习词汇和句子</div>
+      </a>
+      <a class="link-card" href="https://www.ted.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🎬</span><span class="lc-name">TED Talks</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">高质量英语演讲视频，双语字幕，跟读模仿首选</div>
+      </a>
+    </div>
+  </div>
+
+  <!-- Daily Phrase System -->
+  <div class="card">
+    <div class="card-title">📖 每日 10 句口语训练</div>
+    <div class="phrase-stats">
+      <div class="phrase-stat"><div class="ps-num" id="phrase-total">300+</div><div class="ps-label">总句数</div></div>
+      <div class="phrase-stat"><div class="ps-num" id="phrase-learned">0</div><div class="ps-label">已掌握</div></div>
+      <div class="phrase-stat"><div class="ps-num" id="phrase-day">Day 1</div><div class="ps-label">当前天数</div></div>
+      <div class="phrase-stat"><div class="ps-num" id="phrase-percent">0%</div><div class="ps-label">完成率</div></div>
+    </div>
+    <div class="phrase-progress-bar"><div class="phrase-progress-fill" id="phrase-progress" style="width:0%;"></div></div>
+    <div class="phrase-header">
+      <div class="phrase-day-badge" id="phrase-day-badge">📅 Day 1 · 日常问候</div>
+      <div class="phrase-nav">
+        <button id="phrase-prev" onclick="changeDay(-1)">← 上一日</button>
+        <button class="today-btn" onclick="goToday()">今日</button>
+        <button id="phrase-next" onclick="changeDay(1)">下一日 →</button>
+      </div>
+    </div>
+    <div class="phrase-list" id="phrase-list"></div>
+    <div style="margin-top:14px;display:flex;gap:8px;">
+      <button onclick="markAllLearned()" style="padding:10px 20px;border-radius:8px;background:var(--c-english);color:#fff;font-size:13px;font-weight:600;">✓ 全部标记已掌握</button>
+      <button onclick="resetDay()" style="padding:10px 20px;border-radius:8px;background:var(--bg);color:var(--text-secondary);font-size:13px;font-weight:600;">↻ 重置本日</button>
+    </div>
+  </div>
+
+  <div class="tip-box">
+    💡 <b>使用方法：</b>系统内置 300+ 条常用口语，按类别循环排列，每日 10 句。点击每句右侧方框标记"已掌握"，进度自动保存。建议先听 BBC/TED 材料，再用 WorkBuddy AI 对话练习今日句子，最后自由输出巩固。
+  </div>
+</section>
+
+<!-- ==================== AI LEARN ==================== -->
+<section class="page" id="page-ailearn">
+  <div class="section-header" style="background:linear-gradient(135deg,#6366f1,#4f46e5);">
+    <div class="sh-icon">🤖</div>
+    <div>
+      <div class="sh-title">学习 AI 知识</div>
+      <div class="sh-sub">每日 15:00 - 16:00 · 1 小时 · 午休后学习时段</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">📚 60 分钟学习结构</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(99,102,241,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">📖</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">阅读 / 观看教程</div><div style="font-size:12px;color:var(--text-secondary);">文章 / 视频教程学习新知识</div></div>
+          <span style="font-weight:700;color:var(--c-ailearn);">30min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(99,102,241,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">✍️</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">笔记整理</div><div style="font-size:12px;color:var(--text-secondary);">记录要点 + 个人理解</div></div>
+          <span style="font-weight:700;color:var(--c-ailearn);">15min</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(99,102,241,0.1);display:flex;align-items:center;justify-content:center;font-size:18px;">🔬</div>
+          <div style="flex:1;"><div style="font-weight:600;font-size:14px;">动手实践</div><div style="font-size:12px;color:var(--text-secondary);">用 WorkBuddy / AI 工具实操</div></div>
+          <span style="font-weight:700;color:var(--c-ailearn);">15min</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🗺️ 学习路线图</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <div style="padding:12px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-weight:700;font-size:14px;">AI 工具使用</span>
+            <span style="font-size:12px;color:var(--c-ailearn);font-weight:600;">进行中</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-secondary);">Midjourney / SD / WorkBuddy 等工具实战</div>
+          <div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:65%;background:var(--c-ailearn);"></div></div>
+        </div>
+        <div style="padding:12px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-weight:700;font-size:14px;">Prompt Engineering</span>
+            <span style="font-size:12px;color:var(--c-ailearn);font-weight:600;">进行中</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-secondary);">提示词工程，提升 AI 输出质量</div>
+          <div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:50%;background:var(--c-ailearn);"></div></div>
+        </div>
+        <div style="padding:12px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-weight:700;font-size:14px;">AI 设计工作流</span>
+            <span style="font-size:12px;color:var(--c-ailearn);font-weight:600;">探索中</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-secondary);">AI + 设计融合工作流搭建</div>
+          <div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:35%;background:var(--c-ailearn);"></div></div>
+        </div>
+        <div style="padding:12px 14px;background:var(--bg);border-radius:var(--radius-sm);">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+            <span style="font-weight:700;font-size:14px;">AI 自动化 / Agent</span>
+            <span style="font-size:12px;color:var(--c-ailearn);font-weight:600;">入门</span>
+          </div>
+          <div style="font-size:12px;color:var(--text-secondary);">AI Agent 搭建，自动化工作流</div>
+          <div class="progress-bar" style="margin-top:8px;"><div class="progress-fill" style="width:15%;background:var(--c-ailearn);"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🔗 推荐学习资源</div>
+    <div class="grid-2" style="gap:12px;">
+      <a class="link-card" href="https://platform.openai.com/docs" target="_blank">
+        <div class="lc-top"><span class="lc-icon">📄</span><span class="lc-name">OpenAI 官方文档</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">GPT API 使用文档、Prompt 工程指南、最佳实践</div>
+        <div class="lc-url">platform.openai.com/docs</div>
+      </a>
+      <a class="link-card" href="https://docs.anthropic.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">📄</span><span class="lc-name">Anthropic 文档</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">Claude AI 使用文档，Prompt 设计与多轮对话指南</div>
+        <div class="lc-url">docs.anthropic.com</div>
+      </a>
+      <a class="link-card" href="https://www.deeplearning.ai" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🏫</span><span class="lc-name">吴恩达 AI 课程</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">DeepLearning.AI，免费短课程：Prompt Engineering、AI for Everyone</div>
+        <div class="lc-url">deeplearning.ai</div>
+      </a>
+      <a class="link-card" href="https://www.coursera.org" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🎓</span><span class="lc-name">Coursera</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">斯坦福/谷歌等名校 AI 课程，可免费旁听</div>
+        <div class="lc-url">coursera.org</div>
+      </a>
+      <a class="link-card" href="https://huggingface.co" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🤗</span><span class="lc-name">Hugging Face</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">AI 模型社区，开源模型库、NLP 课程、在线 Demo</div>
+        <div class="lc-url">huggingface.co</div>
+      </a>
+      <a class="link-card" href="https://www.bilibili.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">🎥</span><span class="lc-name">B站 AI 教程</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">搜索"AI教程""Stable Diffusion""Prompt工程"，大量中文视频教程</div>
+        <div class="lc-url">bilibili.com</div>
+      </a>
+      <a class="link-card" href="https://www.workbuddy.cn/docs/workbuddy/Overview" target="_blank">
+        <div class="lc-top"><span class="lc-icon">📖</span><span class="lc-name">WorkBuddy 文档</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">WorkBuddy 使用指南，MCP 配置、Skill 开发、自动化任务</div>
+        <div class="lc-url">workbuddy.cn/docs</div>
+      </a>
+      <a class="link-card" href="https://paperswithcode.com" target="_blank">
+        <div class="lc-top"><span class="lc-icon">📑</span><span class="lc-name">Papers with Code</span><span class="lc-arrow">↗</span></div>
+        <div class="lc-desc">最新 AI 论文 + 代码实现，追踪前沿技术</div>
+        <div class="lc-url">paperswithcode.com</div>
+      </a>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">📝 学习笔记</div>
+    <input class="note-input" placeholder="今天学到的 AI 知识要点..." onkeydown="if(event.key==='Enter'){this.value='';alert('已保存！');}">
+    <div style="margin-top:10px;font-size:13px;color:var(--text-secondary);">
+      💡 建议每天记录 3 个要点：① 新学概念 ② 实操发现 ③ 可应用到设计/直播的方式
+    </div>
+  </div>
+
+  <div class="tip-box">
+    💡 <b>AI 学习 + 职业闭环：</b>学到的 AI 知识直接应用到设计工作（AI 辅助出图）和直播（AI 工具演示作为直播内容）。每周四直播做 AI 工具演示，学习→实践→分享→反馈→再学习，形成完整成长闭环。
+  </div>
+</section>
+
+<!-- ==================== DAILY REVIEW ==================== -->
+<section class="page" id="page-review">
+  <div class="section-header" style="background:linear-gradient(135deg,#f59e0b,#ec4899);">
+    <div class="sh-icon">📝</div>
+    <div>
+      <div class="sh-title">每日复盘</div>
+      <div class="sh-sub">每日 21:00 · KISS 日常复盘 + GRAI 重大事项复盘 · 自动化闭环</div>
+    </div>
+  </div>
+
+  <!-- One-sentence conclusion -->
+  <div class="review-conclusion">
+    <div class="review-conclusion-label">📌 今日一句话结论</div>
+    <div class="review-conclusion-text" id="review-conclusion-display">暂未填写 — 点击下方编辑</div>
+    <textarea id="review-conclusion-input" class="grai-content" style="display:none;margin-top:8px;min-height:40px;" placeholder="用一句话总结今天的核心收获或判断..."></textarea>
+  </div>
+
+  <!-- Tomorrow's most important action -->
+  <div class="review-action-highlight">
+    <div style="font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;">🔥 明日最重要的行动</div>
+    <div id="review-tomorrow-display" style="font-size:14px;line-height:1.6;color:var(--text-primary);">暂未填写</div>
+    <textarea id="review-tomorrow-input" class="grai-content" style="display:none;margin-top:8px;min-height:50px;" placeholder="明天最需要完成的一件事..."></textarea>
+  </div>
+
+  <!-- KISS Daily Review -->
+  <div class="card">
+    <div class="card-title">🔄 KISS 日常复盘 <span style="font-size:12px;font-weight:500;color:var(--text-secondary);margin-left:8px;">事实/证据 → 判断 → 下一步行动</span></div>
+    <div class="kiss-grid">
+      <!-- Keep -->
+      <div class="kiss-card keep">
+        <div class="kiss-header">
+          <span class="kiss-badge">Keep</span>
+          <span class="kiss-title">✅ 保留</span>
+        </div>
+        <div class="kiss-section">
+          <div class="kiss-section-label">事实</div>
+          <div class="kiss-section-content" id="kiss-keep-fact-display"></div>
+          <textarea class="kiss-section-content" id="kiss-keep-fact-input" style="display:none;margin-top:6px;" placeholder="今天做了什么值得保留的事？"></textarea>
+        </div>
+        <div class="kiss-section">
+          <div class="kiss-section-label">判断</div>
+          <div class="kiss-section-content" id="kiss-keep-judge-display"></div>
+          <textarea class="kiss-section-content" id="kiss-keep-judge-input" style="display:none;margin-top:6px;" placeholder="为什么这件事值得保留？"></textarea>
+        </div>
+        <div class="kiss-section">
+          <div class="kiss-section-label">下一步行动</div>
+          <div class="kiss-section-content" id="kiss-keep-action-display"></div>
+          <textarea class="kiss-section-content" id="kiss-keep-action-input" style="display:none;margin-top:6px;" placeholder="具体如何继续保持？"></textarea>
+        </div>
+      </div>
+
+      <!-- Improve -->
+      <div class="kiss-card improve">
+        <div class="kiss-header">
+          <span class="kiss-badge">Improve</span>
+          <span class="kiss-title">⚡ 改进</span>
+        </div>
+        <div class="kiss-section">
+          <div class="kiss-section-label">事实</div>
+          <div class="kiss-section-content" id="kiss-improve-fact-display"></div>
+          <textarea class="kiss-section-content" id="kiss-improve-fact-input" style="display:none;margin-top:6px;" placeholder="今天什么事可以做得更好？"></textarea>
+        </div>
+        <div class="kiss-section">
+          <div class="kiss-section-label">判断</div>
+          <div class="kiss-section-content" id="kiss-improve-judge-display"></div>
+          <textarea class="kiss-section-content" id="kiss-improve-judge-input" style="display:none;margin-top:6px;" placeholder="为什么需要改进？"></textarea>
+        </div>
+        <div class="kiss-section">
+          <div class="kiss-section-label">下一步行动</div>
+          <div class="kiss-section-content" id="kiss-improve-action-display"></div>
+          <textarea class="kiss-section-content" id="kiss-improve-action-input" style="display:none;margin-top:6px;" placeholder="具体如何改进？"></textarea>
+        </div>
+      </div>
+
+      <!-- Stop -->
+      <div class="kiss-card stop">
+        <div class="kiss-header">
+          <span class="kiss-badge">Stop</span>
+          <span class="kiss-title">🛑 停止</span>
+        </div>
+        <div class="kiss-section">
+          <div class="kiss-section-label">事实</div>
+          <div class="kiss-section-content" id="kiss-stop-fact-display"></div>
+          <textarea class="kiss-section-content" id="kiss-stop-fact-input" style="display:none;margin-top:6px;" placeholder="今天什么事不该再做？"></textarea>
+        </div>
+        <div class="kiss-section">
+          <div class="kiss-section-label">判断</div>
+          <div class="kiss-section-content" id="kiss-stop-judge-display"></div>
+          <textarea class="kiss-section-content" id="kiss-stop-judge-input" style="display:none;margin-top:6px;" placeholder="为什么应该停止？"></textarea>
+        </div>
+        <div class="kiss-section">
+          <div class="kiss-section-label">下一步行动</div>
+          <div class="kiss-section-content" id="kiss-stop-action-display"></div>
+          <textarea class="kiss-section-content" id="kiss-stop-action-input" style="display:none;margin-top:6px;" placeholder="具体如何避免再次发生？"></textarea>
+        </div>
+      </div>
+
+      <!-- Start -->
+      <div class="kiss-card start">
+        <div class="kiss-header">
+          <span class="kiss-badge">Start</span>
+          <span class="kiss-title">🚀 启动</span>
+        </div>
+        <div class="kiss-section">
+          <div class="kiss-section-label">事实</div>
+          <div class="kiss-section-content" id="kiss-start-fact-display"></div>
+          <textarea class="kiss-section-content" id="kiss-start-fact-input" style="display:none;margin-top:6px;" placeholder="今天发现了什么新机会或想法？"></textarea>
+        </div>
+        <div class="kiss-section">
+          <div class="kiss-section-label">判断</div>
+          <div class="kiss-section-content" id="kiss-start-judge-display"></div>
+          <textarea class="kiss-section-content" id="kiss-start-judge-input" style="display:none;margin-top:6px;" placeholder="为什么值得开始？"></textarea>
+        </div>
+        <div class="kiss-section">
+          <div class="kiss-section-label">下一步行动</div>
+          <div class="kiss-section-content" id="kiss-start-action-display"></div>
+          <textarea class="kiss-section-content" id="kiss-start-action-input" style="display:none;margin-top:6px;" placeholder="具体何时、如何开始？"></textarea>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GRAI Major Review -->
+  <div class="grai-card">
+    <div class="card-title" style="margin-bottom:16px;">🎯 GRAI 重大事项复盘 <span style="font-size:12px;font-weight:500;color:var(--text-secondary);margin-left:8px;">仅在发生重大事件/里程碑时填写</span></div>
+
+    <div class="grai-section">
+      <div class="grai-label"><span class="grai-tag" style="background:#6366f1;">Goal</span> 目标</div>
+      <div class="grai-content" id="grai-goal-display"></div>
+      <textarea class="grai-content" id="grai-goal-input" style="display:none;margin-top:6px;" placeholder="这次重大事项的目标是什么？"></textarea>
+    </div>
+
+    <div class="grai-section">
+      <div class="grai-label"><span class="grai-tag" style="background:#22c55e;">Result</span> 结果</div>
+      <div class="grai-content" id="grai-result-display"></div>
+      <textarea class="grai-content" id="grai-result-input" style="display:none;margin-top:6px;" placeholder="实际达成了什么结果？（列举已确认的事实）"></textarea>
+    </div>
+
+    <div class="grai-section">
+      <div class="grai-label"><span class="grai-tag" style="background:#f59e0b;">Analysis</span> 分析</div>
+      <div class="grai-content" id="grai-analysis-display"></div>
+      <textarea class="grai-content" id="grai-analysis-input" style="display:none;margin-top:6px;" placeholder="有效因素是什么？返工原因？已确认事实？未知项？"></textarea>
+    </div>
+
+    <div class="grai-section">
+      <div class="grai-label"><span class="grai-tag" style="background:#ec4899;">Insight</span> 洞察</div>
+      <div class="grai-content" id="grai-insight-display"></div>
+      <textarea class="grai-content" id="grai-insight-input" style="display:none;margin-top:6px;" placeholder="从中提炼出什么可复用的方法论或规律？"></textarea>
+    </div>
+  </div>
+
+  <!-- New User Insights -->
+  <div class="review-meta-card">
+    <div class="review-meta-title">🧠 今日新增的用户认知</div>
+    <div class="review-meta-item" id="review-cognition-display"></div>
+    <textarea class="grai-content" id="review-cognition-input" style="display:none;margin-top:8px;min-height:70px;" placeholder="今天对自己的工作习惯、偏好、能力有什么新认识？按「已确认 / 待验证」分类记录..."></textarea>
+  </div>
+
+  <!-- Automation Opportunities -->
+  <div class="review-meta-card">
+    <div class="review-meta-title">🤖 新发现的自动化机会</div>
+    <div class="review-meta-item" id="review-automation-display"></div>
+    <textarea class="grai-content" id="review-automation-input" style="display:none;margin-top:8px;min-height:70px;" placeholder="发现哪些重复性工作可以自动化？哪些流程可以模板化？"></textarea>
+  </div>
+
+  <!-- Pending Questions -->
+  <div class="review-pending">
+    <div style="font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;">❓ 待用户确认的问题</div>
+    <div class="review-meta-item" id="review-pending-display" style="background:rgba(239,68,68,0.06);"></div>
+    <textarea class="grai-content" id="review-pending-input" style="display:none;margin-top:8px;min-height:50px;" placeholder="有哪些问题需要进一步确认才能推进？"></textarea>
+  </div>
+
+  <!-- Failed / Unexecuted -->
+  <div class="review-failed">
+    <div style="font-size:14px;font-weight:700;margin-bottom:8px;display:flex;align-items:center;gap:8px;">📋 未执行或失败项</div>
+    <div class="review-meta-item" id="review-failed-display" style="background:rgba(107,114,128,0.06);"></div>
+    <textarea class="grai-content" id="review-failed-input" style="display:none;margin-top:8px;min-height:50px;" placeholder="今天有什么计划内的事没有完成？原因是什么？"></textarea>
+  </div>
+
+  <!-- Review History -->
+  <div class="card">
+    <div class="card-title">📚 历史复盘记录</div>
+    <div id="review-history-list">
+      <div style="text-align:center;padding:20px;color:var(--text-secondary);font-size:13px;">暂无历史记录 · 完成今日复盘后自动保存</div>
+    </div>
+  </div>
+
+  <!-- Save Bar -->
+  <div class="review-save-bar">
+    <div class="review-save-info" id="review-save-info">📝 复盘数据保存在本地浏览器 · 每日自动归档</div>
+    <div style="display:flex;gap:10px;">
+      <button onclick="toggleReviewEditMode()" id="review-edit-btn" style="background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:10px 20px;font-size:14px;font-weight:600;cursor:pointer;">✏️ 编辑</button>
+      <button onclick="saveReview()" class="review-save-btn">💾 保存今日复盘</button>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== DATA SYNC ==================== -->
+<section class="page" id="page-datasync">
+  <div class="page-header">
+    <div>
+      <div class="page-title"><span class="emoji">☁️</span>数据同步与备份</div>
+      <div class="page-subtitle">本地备份导出/导入 · 云端跨设备同步 · 数据安全掌控</div>
+    </div>
+    <div class="page-badge" style="background:linear-gradient(135deg,#10b981,#059669);">数据管理</div>
+  </div>
+
+  <!-- Data Overview -->
+  <div class="card">
+    <div class="card-title">📊 当前本地数据概览</div>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:10px;">以下数据存储在浏览器的 localStorage 中。清除浏览器数据、使用无痕模式或换设备都会导致数据丢失。</p>
+    <div class="dm-data-list" id="dm-data-list">
+      <div class="dm-data-item"><span class="dm-di-name">⏰ 任务勾选</span><span class="dm-di-size" id="dm-size-checklist">--</span></div>
+      <div class="dm-data-item"><span class="dm-di-name">📅 时间轴状态</span><span class="dm-di-size" id="dm-size-timeline">--</span></div>
+      <div class="dm-data-item"><span class="dm-di-name">🇬🇧 口语进度</span><span class="dm-di-size" id="dm-size-phrases">--</span></div>
+      <div class="dm-data-item"><span class="dm-di-name">🌤️ 天气缓存</span><span class="dm-di-size" id="dm-size-weather">--</span></div>
+      <div class="dm-data-item"><span class="dm-di-name">📝 复盘记录</span><span class="dm-di-size" id="dm-size-reviews">--</span></div>
+      <div class="dm-data-item"><span class="dm-di-name">📦 总计</span><span class="dm-di-size" id="dm-size-total">--</span></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="dm-btn dm-btn-primary" onclick="refreshDataOverview()">🔄 刷新概览</button>
+      <button class="dm-btn dm-btn-danger" onclick="clearLocalData()">🗑️ 清空本地数据</button>
+    </div>
+    <div class="dm-status" id="dm-clear-status"></div>
+  </div>
+
+  <!-- Export & Import -->
+  <div class="card">
+    <div class="card-title">💾 本地备份（导出 / 导入）</div>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">将所有本地数据导出为一个 JSON 文件保存到你的设备，随时可以导入恢复。建议每周备份一次。</p>
+    <div style="display:flex;gap:12px;flex-wrap:wrap;">
+      <button class="dm-btn dm-btn-primary" onclick="exportBackup()">📥 导出备份文件</button>
+      <button class="dm-btn dm-btn-secondary" onclick="document.getElementById('import-file-input').click()">📤 导入备份文件</button>
+      <input type="file" id="import-file-input" class="file-input-hidden" accept=".json" onchange="importBackup(event)">
+    </div>
+    <div class="dm-status" id="dm-export-status"></div>
+    <div class="dm-status" id="dm-import-status"></div>
+    <div class="tip-box" style="margin-top:14px;">
+      💡 <b>使用建议：</b>导出文件包含你的全部数据（任务状态、口语进度、复盘记录等）。请妥善保管，不要分享给他人。导入会覆盖当前数据，操作前请确认。
+    </div>
+  </div>
+
+  <!-- Cloud Sync -->
+  <div class="card">
+    <div class="card-title">☁️ 云端同步（跨设备） <span id="cloud-badge-wrapper" style="margin-left:8px;"></span></div>
+    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">连接 Supabase 云端数据库后，电脑端和手机端数据自动同步。换设备登录账号即可恢复全部数据。</p>
+
+    <!-- Not Connected State -->
+    <div id="cloud-not-connected">
+      <div class="cloud-setup-steps">
+        <b>📋 首次使用，请按以下步骤设置（约 5 分钟）：</b>
+        <ol>
+          <li>打开 <a href="https://supabase.com" target="_blank" rel="noopener">Supabase 官网</a>，点击「Start your project」注册（可用 GitHub 账号一键登录）</li>
+          <li>点击「New Project」创建项目，名称随意填（如 my-workbench），设置数据库密码</li>
+          <li>等待项目创建完成（约 1-2 分钟），进入项目后点击左侧「SQL Editor」</li>
+          <li>将下方建表代码粘贴进去，点击「Run」执行：</li>
+        </ol>
+        <div style="margin:10px 0;padding:12px;background:#1e1e1e;color:#d4d4d4;border-radius:8px;font-family:monospace;font-size:12px;overflow-x:auto;white-space:pre;">CREATE TABLE IF NOT EXISTS workbench_data (
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  data_key TEXT NOT NULL,
+  data_value JSONB,
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  PRIMARY KEY (user_id, data_key)
+);
+
+ALTER TABLE workbench_data ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users manage own data"
+ON workbench_data FOR ALL
+USING (auth.uid() = user_id)
+WITH CHECK (auth.uid() = user_id);</div>
+          <li>点击左侧「Project Settings」→「API」，复制 <code>Project URL</code> 和 <code>anon public key</code></li>
+          <li>将这两个值填入下方输入框，点击「连接」</li>
+        </ol>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div class="cloud-input-group">
+          <label>🔗 Supabase Project URL</label>
+          <input type="text" id="supabase-url" placeholder="https://xxxxx.supabase.co" autocomplete="off">
+        </div>
+        <div class="cloud-input-group">
+          <label>🔑 Supabase Anon Key</label>
+          <input type="text" id="supabase-key" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..." autocomplete="off">
+        </div>
+        <button class="dm-btn dm-btn-primary" onclick="connectSupabase()">🔗 连接 Supabase</button>
+        <div class="dm-status" id="cloud-connect-status"></div>
+      </div>
+    </div>
+
+    <!-- Connected State -->
+    <div id="cloud-connected" style="display:none;">
+      <div class="cloud-user-info">
+        <div>
+          <div class="cloud-user-email" id="cloud-user-email">--</div>
+          <div class="cloud-last-sync" id="cloud-last-sync">上次同步：从未</div>
+        </div>
+        <div class="cloud-auth-row">
+          <button class="dm-btn dm-btn-primary" onclick="syncToCloud()">⬆️ 立即上传到云端</button>
+          <button class="dm-btn dm-btn-secondary" onclick="syncFromCloud()">⬇️ 从云端拉取</button>
+          <button class="dm-btn dm-btn-danger" onclick="cloudLogout()">退出登录</button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px;">
+        <label style="font-size:13px;display:flex;align-items:center;gap:6px;cursor:pointer;">
+          <input type="checkbox" id="auto-sync-toggle" onchange="toggleAutoSync(this)" style="width:16px;height:16px;">
+          自动同步（每次修改后自动上传）
+        </label>
+      </div>
+
+      <div class="cloud-sync-log" id="cloud-sync-log"></div>
+
+      <div class="tip-box" style="margin-top:14px;">
+        💡 <b>云端同步说明：</b>上传会将本地全部数据推送到云端；拉取会用云端数据覆盖本地。自动同步开启时，每次勾选任务、保存复盘等操作都会自动上传。换设备时，登录同一账号后点击「从云端拉取」即可恢复全部数据。
+      </div>
+    </div>
+
+    <!-- Auth Modal (inline) -->
+    <div id="cloud-auth-section" style="display:none;margin-top:16px;padding:16px;border:1px solid #e5e7eb;border-radius:10px;">
+      <div style="font-weight:700;margin-bottom:12px;">🔐 登录 / 注册账号</div>
+      <div class="cloud-input-group">
+        <label>邮箱</label>
+        <input type="email" id="auth-email" placeholder="your@email.com" autocomplete="email">
+      </div>
+      <div class="cloud-input-group">
+        <label>密码（至少 6 位）</label>
+        <input type="password" id="auth-password" placeholder="••••••" autocomplete="current-password">
+      </div>
+      <div class="cloud-auth-row">
+        <button class="dm-btn dm-btn-primary" onclick="cloudSignIn()">登录</button>
+        <button class="dm-btn dm-btn-secondary" onclick="cloudSignUp()">注册新账号</button>
+      </div>
+      <div class="dm-status" id="cloud-auth-status"></div>
+    </div>
+  </div>
+
+  <!-- Data Safety Info -->
+  <div class="card">
+    <div class="card-title">ℹ️ 数据安全说明</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:8px;">
+      <div style="padding:14px;background:#f8f9fa;border-radius:8px;">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px;">📱 本地存储</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">数据存在浏览器 localStorage。同一浏览器下关闭/重开/刷新都保留。清除浏览器数据、无痕模式、换设备会丢失。</div>
+      </div>
+      <div style="padding:14px;background:#f8f9fa;border-radius:8px;">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px;">💾 导出备份</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">将本地数据下载为 JSON 文件。文件在你自己的设备上，你完全掌控。建议定期备份。</div>
+      </div>
+      <div style="padding:14px;background:#f8f9fa;border-radius:8px;">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px;">☁️ 云端同步</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">数据加密传输到 Supabase 云端（AWS 数据中心）。免费额度 500MB，个人使用绰绰有余。可随时导出或删除。</div>
+      </div>
+      <div style="padding:14px;background:#f8f9fa;border-radius:8px;">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px;">🔄 换设备找回</div>
+        <div style="font-size:12px;color:var(--text-secondary);line-height:1.6;">新设备打开网页 → 数据同步页面 → 登录同一账号 → 点击「从云端拉取」→ 全部数据恢复。</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ========== Navigation ==========
+function navTo(pageId){
+  document.querySelectorAll('.nav-item').forEach(item=>{
+    item.classList.toggle('active',item.dataset.page===pageId);
+  });
+  document.querySelectorAll('.page').forEach(page=>{
+    page.classList.toggle('active',page.id==='page-'+pageId);
+  });
+  if(window.innerWidth<=768){
+    document.getElementById('sidebar').classList.remove('open');
+  }
+  window.scrollTo(0,0);
+}
+
+// ========== Mobile Sidebar ==========
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ========== Checklist Toggle ==========
+function toggleCheck(el){
+  el.classList.toggle('done');
+  saveChecklistState();
+}
+
+function saveChecklistState(){
+  const state={};
+  document.querySelectorAll('.checklist').forEach((cl,idx)=>{
+    state[idx]=[];
+    cl.querySelectorAll('.checklist-item').forEach(item=>{
+      state[idx].push(item.classList.contains('done'));
+    });
+  });
+  try{localStorage.setItem('wb_checklist',JSON.stringify(state));}catch(e){}
+  scheduleAutoSync();
+}
+
+function loadChecklistState(){
+  try{
+    const state=JSON.parse(localStorage.getItem('wb_checklist')||'{}');
+    document.querySelectorAll('.checklist').forEach((cl,idx)=>{
+      if(state[idx]){
+        cl.querySelectorAll('.checklist-item').forEach((item,i)=>{
+          if(state[idx][i])item.classList.add('done');
+        });
+      }
+    });
+  }catch(e){}
+}
+
+// ========== Song Input ==========
+function addSong(input){
+  if(input.value.trim()){
+    alert('已添加: '+input.value);
+    input.value='';
+  }
+}
+
+// ========== English Phrase Database (300+) ==========
+const phrases = [
+  // --- 日常问候 Daily Greetings (20) ---
+  ["How's it going?","最近怎么样？","日常问候"],
+  ["What's up?","有什么新鲜事吗？","日常问候"],
+  ["Long time no see!","好久不见！","日常问候"],
+  ["How have you been?","你最近过得怎么样？","日常问候"],
+  ["It's been a while!","好一阵子没见了！","日常问候"],
+  ["How was your day?","今天过得怎么样？","日常问候"],
+  ["I'm doing great, thanks!","我挺好的，谢谢！","日常问候"],
+  ["Couldn't be better!","再好不过了！","日常问候"],
+  ["Same as always.","老样子。","日常问候"],
+  ["Not too bad.","还不错。","日常问候"],
+  ["What's new?","有什么新鲜事？","日常问候"],
+  ["Nice to meet you!","很高兴认识你！","日常问候"],
+  ["It's a pleasure to meet you.","很荣幸认识你。","日常问候"],
+  ["How's everything going?","一切都好吗？","日常问候"],
+  ["Take care of yourself!","照顾好自己！","日常问候"],
+  ["Have a great day!","祝你今天愉快！","日常问候"],
+  ["Catch you later!","回头见！","日常问候"],
+  ["See you around!","回头见！","日常问候"],
+  ["It was nice talking to you.","跟你聊天很开心。","日常问候"],
+  ["Let's keep in touch!","保持联系！","日常问候"],
+
+  // --- 日常生活 Daily Life (30) ---
+  ["I usually wake up at seven.","我通常七点起床。","日常生活"],
+  ["I had a really good sleep last night.","我昨晚睡得很好。","日常生活"],
+  ["I'm not a morning person.","我不是早起型的人。","日常生活"],
+  ["What time is it now?","现在几点了？","日常生活"],
+  ["It's time to get up.","该起床了。","日常生活"],
+  ["I need to get ready.","我得准备一下。","日常生活"],
+  ["Let me grab a quick breakfast.","我赶紧吃个早餐。","日常生活"],
+  ["I'm running late!","我要迟到了！","日常生活"],
+  ["I'll be there in five minutes.","我五分钟后到。","日常生活"],
+  ["Can you give me a hand?","你能帮我一下吗？","日常生活"],
+  ["Could you do me a favor?","能帮我个忙吗？","日常生活"],
+  ["No problem at all!","完全没问题！","日常生活"],
+  ["I appreciate your help.","感谢你的帮助。","日常生活"],
+  ["That's so kind of you!","你太好了！","日常生活"],
+  ["I owe you one.","我欠你一个人情。","日常生活"],
+  ["It's no big deal.","没什么大不了的。","日常生活"],
+  ["Don't worry about it.","别放在心上。","日常生活"],
+  ["I completely forgot!","我完全忘了！","日常生活"],
+  ["Let me think about it.","让我想想。","日常生活"],
+  ["That makes sense.","有道理。","日常生活"],
+  ["I have no idea.","我不知道。","日常生活"],
+  ["Could you say that again?","你能再说一遍吗？","日常生活"],
+  ["I didn't catch that.","我没听清。","日常生活"],
+  ["Speak more slowly, please.","请说慢一点。","日常生活"],
+  ["How do you say this in English?","这个英语怎么说？","日常生活"],
+  ["What does this mean?","这是什么意思？","日常生活"],
+  ["I'm still learning.","我还在学习中。","日常生活"],
+  ["Practice makes perfect!","熟能生巧！","日常生活"],
+  ["Let's call it a day.","今天就到这里吧。","日常生活"],
+  ["I need to get some rest.","我需要休息一下。","日常生活"],
+
+  // --- 设计专业 Design (30) ---
+  ["I'm working on a new design project.","我在做一个新的设计项目。","设计专业"],
+  ["Could you send me the design brief?","能把设计需求发给我吗？","设计专业"],
+  ["What's the deadline for this project?","这个项目的截止日期是什么时候？","设计专业"],
+  ["I need some inspiration for this design.","这个设计我需要一些灵感。","设计专业"],
+  ["Let me sketch out some ideas first.","让我先画几个草图。","设计专业"],
+  ["I'll send you the first draft soon.","我很快把初稿发给你。","设计专业"],
+  ["Can you give me some feedback on this?","你能给我一些反馈吗？","设计专业"],
+  ["The color scheme needs some adjustment.","配色方案需要调整。","设计专业"],
+  ["I think the layout works well.","我觉得这个布局效果不错。","设计专业"],
+  ["Let's tweak the typography a bit.","我们调整一下字体。","设计专业"],
+  ["Can you make the logo bigger?","能把 logo 放大一点吗？","设计专业"],
+  ["The contrast is too low.","对比度太低了。","设计专业"],
+  ["I love the minimalist style.","我喜欢极简风格。","设计专业"],
+  ["This design feels modern and clean.","这个设计感觉很现代很干净。","设计专业"],
+  ["We need to improve the user experience.","我们需要改善用户体验。","设计专业"],
+  ["The visual hierarchy is a bit off.","视觉层次有点问题。","设计专业"],
+  ["Let me export it as a PNG file.","我把它导出为 PNG 文件。","设计专业"],
+  ["I'll create a mockup for the presentation.","我做个效果图用于展示。","设计专业"],
+  ["The client wants a more vibrant color palette.","客户想要更鲜艳的配色。","设计专业"],
+  ["Can you align these elements?","能把这些元素对齐吗？","设计专业"],
+  ["I used Figma to create this design.","我用 Figma 做的这个设计。","设计专业"],
+  ["The resolution is too low for print.","这个分辨率用来印刷太低了。","设计专业"],
+  ["Let's add some white space here.","这里加一些留白。","设计专业"],
+  ["I think we should simplify the design.","我觉得我们应该简化设计。","设计专业"],
+  ["The font size needs to be larger.","字号需要再大一点。","设计专业"],
+  ["Can you create a dark mode version?","能做一个深色模式版本吗？","设计专业"],
+  ["I'll finalize the design by tomorrow.","我明天前定稿。","设计专业"],
+  ["This looks great! Ship it!","看起来很棒！可以交付了！","设计专业"],
+  ["Let me polish the details.","我来打磨一下细节。","设计专业"],
+  ["The brand guidelines are on the shared drive.","品牌规范在共享盘里。","设计专业"],
+
+  // --- 直播社交 Streaming & Social (30) ---
+  ["Welcome to my live stream!","欢迎来到我的直播间！","直播社交"],
+  ["Thanks for joining the stream!","感谢来直播间！","直播社交"],
+  ["Don't forget to follow!","别忘了关注哦！","直播社交"],
+  ["If you like this, please share it!","如果喜欢请分享！","直播社交"],
+  ["Thanks for the gift! I really appreciate it!","感谢礼物！太感谢了！","直播社交"],
+  ["What would you like me to do next?","你们想看我接下来做什么？","直播社交"],
+  ["Let me know in the comments!","在评论区告诉我！","直播社交"],
+  ["Say hi in the chat!","在弹幕里打个招呼吧！","直播社交"],
+  ["We just hit a new milestone!","我们刚达到一个新里程碑！","直播社交"],
+  ["I'll be going live at 7 PM tonight.","我今晚7点开播。","直播社交"],
+  ["Thanks for watching, see you tomorrow!","感谢观看，明天见！","直播社交"],
+  ["Let's do a Q&A session!","我们来做个问答环节吧！","直播社交"],
+  ["That's a great question!","这个问题问得好！","直播社交"],
+  ["I'm so glad you're here!","很高兴你来了！","直播社交"],
+  ["You guys are the best!","你们是最棒的！","直播社交"],
+  ["Let's get to 100 likes!","我们冲100个赞吧！","直播社交"],
+  ["I'll be performing a dance for you next.","接下来我给大家跳一段舞。","直播社交"],
+  ["Any song requests?","有点歌的吗？","直播社交"],
+  ["I'll take a short break, don't go anywhere!","我休息一下，别走开！","直播社交"],
+  ["Welcome back! Glad you're still here!","欢迎回来！很高兴你还在！","直播社交"],
+  ["Let's give a shoutout to our new followers!","让我们欢迎新关注者！","直播社交"],
+  ["Today's topic is all about design.","今天的主题是关于设计。","直播社交"],
+  ["I'll show you how to use this AI tool.","我教你们怎么用这个 AI 工具。","直播社交"],
+  ["Feel free to ask me anything!","随便问我什么！","直播社交"],
+  ["Thanks for the support, everyone!","感谢大家的支持！","直播社交"],
+  ["I'm going live on multiple platforms today.","我今天多平台同时直播。","直播社交"],
+  ["The stream will be about two hours today.","今天直播大约两个小时。","直播社交"],
+  ["Let's interact more! Drop a comment!","多互动一下！留个言吧！","直播社交"],
+  ["I read every single comment!","每条评论我都会看！","直播社交"],
+  ["You guys motivate me so much!","你们给了我很大的动力！","直播社交"],
+
+  // --- 情感表达 Emotions (25) ---
+  ["I'm so excited about this!","我对此非常兴奋！","情感表达"],
+  ["That's amazing!","太棒了！","情感表达"],
+  ["I can't believe it!","我简直不敢相信！","情感表达"],
+  ["I'm over the moon!","我太开心了！","情感表达"],
+  ["That's really impressive!","真令人印象深刻！","情感表达"],
+  ["I'm a bit nervous.","我有点紧张。","情感表达"],
+  ["I'm feeling great today!","我今天感觉很好！","情感表达"],
+  ["I'm a little tired.","我有点累。","情感表达"],
+  ["That's so frustrating!","太让人沮丧了！","情感表达"],
+  ["I'm so proud of you!","我为你骄傲！","情感表达"],
+  ["Don't be discouraged!","别灰心！","情感表达"],
+  ["I'm grateful for everything.","我对一切心存感激。","情感表达"],
+  ["That touched my heart.","那感动了我。","情感表达"],
+  ["I'm looking forward to it!","我很期待！","情感表达"],
+  ["I can't wait!","我等不及了！","情感表达"],
+  ["I'm a bit overwhelmed.","我有点应接不暇。","情感表达"],
+  ["That's a relief!","那就放心了！","情感表达"],
+  ["I'm so relieved!","我松了一口气！","情感表达"],
+  ["That's hilarious!","太搞笑了！","情感表达"],
+  ["I'm speechless!","我无语了！","情感表达"],
+  ["I'm having mixed feelings.","我心情很复杂。","情感表达"],
+  ["That blew my mind!","那太震撼了！","情感表达"],
+  ["I'm feeling inspired today!","我今天很有灵感！","情感表达"],
+  ["It's been a tough day.","今天是艰难的一天。","情感表达"],
+  ["I'm in a really good mood.","我心情很好。","情感表达"],
+
+  // --- 工作职场 Work (25) ---
+  ["Let's schedule a meeting.","我们安排个会议吧。","工作职场"],
+  ["Can we move the deadline?","能延长截止日期吗？","工作职场"],
+  ["I'll send you the report by Friday.","我周五前把报告发给你。","工作职场"],
+  ["Let's touch base next week.","我们下周沟通一下。","工作职场"],
+  ["I'm available after 3 PM.","我下午3点后有空。","工作职场"],
+  ["Could you review this for me?","你能帮我审阅一下吗？","工作职场"],
+  ["I think we're on the right track.","我觉得我们的方向是对的。","工作职场"],
+  ["Let's wrap up this project.","我们结束这个项目吧。","工作职场"],
+  ["I need to prioritize my tasks.","我需要排一下任务优先级。","工作职场"],
+  ["The project is going smoothly.","项目进展顺利。","工作职场"],
+  ["We're ahead of schedule.","我们进度超前了。","工作职场"],
+  ["We're running behind schedule.","我们进度落后了。","工作职场"],
+  ["Let me check my calendar.","我看看我的日程。","工作职场"],
+  ["I'll get right on it.","我马上处理。","工作职场"],
+  ["Thanks for the heads up!","感谢提醒！","工作职场"],
+  ["Let's brainstorm some ideas.","我们来头脑风暴一下。","工作职场"],
+  ["I'll follow up with you later.","我稍后跟进。","工作职场"],
+  ["Can we discuss this in detail?","我们能详细讨论一下吗？","工作职场"],
+  ["I'll take care of it.","我来处理。","工作职场"],
+  ["That's outside my scope.","这不在我的职责范围内。","工作职场"],
+  ["Let's divide the work.","我们分工吧。","工作职场"],
+  ["I'm working remotely today.","我今天远程办公。","工作职场"],
+  ["The client approved the design.","客户通过了设计方案。","工作职场"],
+  ["We need to revise the proposal.","我们需要修改提案。","工作职场"],
+  ["Great teamwork, everyone!","大家配合得很好！","工作职场"],
+
+  // --- 餐饮美食 Food (25) ---
+  ["I'm starving! Let's get something to eat.","我饿死了！去吃点东西吧。","餐饮美食"],
+  ["What do you feel like eating?","你想吃什么？","餐饮美食"],
+  ["I'll have what you're having.","跟你一样。","餐饮美食"],
+  ["This tastes amazing!","这个太好吃了！","餐饮美食"],
+  ["Could I see the menu, please?","请给我看一下菜单好吗？","餐饮美食"],
+  ["I'd like to order takeout.","我想点外卖。","餐饮美食"],
+  ["Are you hungry? Let's grab a bite.","你饿吗？我们吃点东西吧。","餐饮美食"],
+  ["I'm a foodie.","我是个吃货。","餐饮美食"],
+  ["This is delicious!","这个很美味！","餐饮美食"],
+  ["I can't eat spicy food.","我不能吃辣。","餐饮美食"],
+  ["I'm allergic to seafood.","我对海鲜过敏。","餐饮美食"],
+  ["Let's try that new restaurant.","我们去试试那家新餐厅吧。","餐饮美食"],
+  ["I'll have a coffee, please.","请给我一杯咖啡。","餐饮美食"],
+  ["Could I get the check, please?","请结账。","餐饮美食"],
+  ["I'm trying to eat healthier.","我在努力吃得更健康。","餐饮美食"],
+  ["The portion is huge!","份量好大！","餐饮美食"],
+  ["I'm on a diet.","我在节食。","餐饮美食"],
+  ["This is the best meal I've had in ages!","这是我很久以来吃过最好的一顿！","餐饮美食"],
+  ["I prefer home-cooked meals.","我更喜欢家常菜。","餐饮美食"],
+  ["Do you want to split the bill?","我们AA吧？","餐饮美食"],
+  ["I'm a vegetarian.","我是素食主义者。","餐饮美食"],
+  ["The food here is overrated.","这里的食物名不副实。","餐饮美食"],
+  ["I could eat this every day!","这个我能天天吃！","餐饮美食"],
+  ["Let's order delivery tonight.","今晚点外卖吧。","餐饮美食"],
+  ["Bon appétit!","慢慢享用！","餐饮美食"],
+
+  // --- 购物消费 Shopping (20) ---
+  ["How much does this cost?","这个多少钱？","购物消费"],
+  ["Is there a discount on this?","这个有折扣吗？","购物消费"],
+  ["Do you have this in a different size?","这个有别的尺码吗？","购物消费"],
+  ["I'm just browsing, thanks.","我只是看看，谢谢。","购物消费"],
+  ["Can I try this on?","我能试穿一下吗？","购物消费"],
+  ["I'll take it!","我要了！","购物消费"],
+  ["Do you accept mobile payment?","你们支持手机支付吗？","购物消费"],
+  ["That's a bit pricey.","有点贵。","购物消费"],
+  ["It's a great deal!","很划算！","购物消费"],
+  ["I'm looking for a gift.","我在找礼物。","购物消费"],
+  ["Can I get a refund?","能退款吗？","购物消费"],
+  ["I'd like to exchange this.","我想换货。","购物消费"],
+  ["Is this on sale?","这个在打折吗？","购物消费"],
+  ["I'll think about it.","我考虑一下。","购物消费"],
+  ["Do you have it in other colors?","有其他颜色吗？","购物消费"],
+  ["The quality is really good.","质量很好。","购物消费"],
+  ["I bought it online.","我在网上买的。","购物消费"],
+  ["Free shipping is the best!","包邮最棒了！","购物消费"],
+  ["I added it to my cart.","我加进购物车了。","购物消费"],
+  ["It's worth every penny!","物有所值！","购物消费"],
+
+  // --- 旅行出行 Travel (25) ---
+  ["Where are you traveling to?","你要去哪里旅行？","旅行出行"],
+  ["I'm planning a trip next month.","我计划下个月旅行。","旅行出行"],
+  ["Is this your first time here?","你是第一次来这里吗？","旅行出行"],
+  ["How do I get to the train station?","怎么去火车站？","旅行出行"],
+  ["I'd like to book a flight.","我想订机票。","旅行出行"],
+  ["Could you call a taxi for me?","能帮我叫辆出租车吗？","旅行出行"],
+  ["What's the weather like there?","那边天气怎么样？","旅行出行"],
+  ["I lost my passport!","我护照丢了！","旅行出行"],
+  ["The view is breathtaking!","景色太美了！","旅行出行"],
+  ["Let's take a photo here!","在这里拍张照吧！","旅行出行"],
+  ["I prefer staying in hotels.","我更喜欢住酒店。","旅行出行"],
+  ["The flight was delayed.","航班延误了。","旅行出行"],
+  ["I love traveling alone.","我喜欢独自旅行。","旅行出行"],
+  ["What's the local specialty?","当地特色是什么？","旅行出行"],
+  ["I'm here for vacation.","我来度假的。","旅行出行"],
+  ["Could you recommend a good restaurant?","能推荐一家好餐厅吗？","旅行出行"],
+  ["How far is it from here?","离这里多远？","旅行出行"],
+  ["I'd like to check in.","我想办理入住。","旅行出行"],
+  ["What time is checkout?","几点退房？","旅行出行"],
+  ["The beach is gorgeous!","海滩太美了！","旅行出行"],
+  ["I'm a bit jet-lagged.","我有点时差反应。","旅行出行"],
+  ["Let's explore the city!","我们去探索这座城市吧！","旅行出行"],
+  ["Do I need a visa?","我需要签证吗？","旅行出行"],
+  ["The trip was unforgettable!","这次旅行令人难忘！","旅行出行"],
+  ["I want to travel the world.","我想环游世界。","旅行出行"],
+
+  // --- 健康运动 Health (20) ---
+  ["I need to work out more.","我需要多锻炼。","健康运动"],
+  ["I go to the gym every day.","我每天去健身房。","健康运动"],
+  ["Do you exercise regularly?","你经常运动吗？","健康运动"],
+  ["I'm trying to lose weight.","我在减肥。","健康运动"],
+  ["Stretching is important before exercise.","运动前拉伸很重要。","健康运动"],
+  ["I feel much better after a workout.","运动后感觉好多了。","健康运动"],
+  ["Let's go for a run!","我们去跑步吧！","健康运动"],
+  ["I do yoga every morning.","我每天早上做瑜伽。","健康运动"],
+  ["Drink plenty of water!","多喝水！","健康运动"],
+  ["I need to get more sleep.","我需要更多睡眠。","健康运动"],
+  ["I pulled a muscle yesterday.","我昨天拉伤肌肉了。","健康运动"],
+  ["Eating healthy is a lifestyle.","健康饮食是一种生活方式。","健康运动"],
+  ["I'm feeling under the weather.","我感觉不太舒服。","健康运动"],
+  ["You should see a doctor.","你应该去看医生。","健康运动"],
+  ["I have a headache.","我头疼。","健康运动"],
+  ["Rest is just as important as exercise.","休息和运动一样重要。","健康运动"],
+  ["I'm trying to build muscle.","我在增肌。","健康运动"],
+  ["Cardio is great for your heart.","有氧运动对心脏好。","健康运动"],
+  ["I need to improve my posture.","我需要改善体态。","健康运动"],
+  ["Consistency is key!","坚持是关键！","健康运动"],
+
+  // --- AI/科技 Tech (25) ---
+  ["Have you tried using AI tools?","你试过用 AI 工具吗？","AI科技"],
+  ["AI is changing the way we work.","AI 正在改变我们的工作方式。","AI科技"],
+  ["I use AI to generate design ideas.","我用 AI 生成设计创意。","AI科技"],
+  ["The prompt needs to be more specific.","提示词需要更具体。","AI科技"],
+  ["Can AI replace human creativity?","AI 能取代人类创造力吗？","AI科技"],
+  ["I'm learning how to write better prompts.","我在学习写更好的提示词。","AI科技"],
+  ["This AI tool saves me so much time.","这个 AI 工具给我省了很多时间。","AI科技"],
+  ["What's your favorite AI tool?","你最喜欢的 AI 工具是什么？","AI科技"],
+  ["The results are surprisingly good!","效果出乎意料地好！","AI科技"],
+  ["AI won't replace you, but someone using AI might.","AI 不会取代你，但会用 AI 的人可能会。","AI科技"],
+  ["I generated this image with AI.","这张图是我用 AI 生成的。","AI科技"],
+  ["The technology is evolving so fast.","技术发展太快了。","AI科技"],
+  ["I'm fascinated by machine learning.","我对机器学习很着迷。","AI科技"],
+  ["Let me show you how this works.","我给你演示一下怎么用。","AI科技"],
+  ["AI is just a tool, not a replacement.","AI 只是工具，不是替代品。","AI科技"],
+  ["The future of design is AI-powered.","设计的未来是 AI 驱动的。","AI科技"],
+  ["I automated my workflow with AI.","我用 AI 自动化了我的工作流。","AI科技"],
+  ["This is a game-changer!","这是革命性的！","AI科技"],
+  ["I'm taking an online AI course.","我在上在线 AI 课程。","AI科技"],
+  ["Have you heard about the new AI model?","你听说新的 AI 模型了吗？","AI科技"],
+  ["Let's experiment with different settings.","我们试试不同的参数设置。","AI科技"],
+  ["The AI generated exactly what I wanted.","AI 生成的正是我想要的。","AI科技"],
+  ["I need to stay updated on AI trends.","我需要跟上 AI 趋势。","AI科技"],
+  ["Artificial intelligence is the future.","人工智能是未来。","AI科技"],
+  ["Let me fine-tune the model.","我来微调一下模型。","AI科技"],
+
+  // --- 流行文化 Pop Culture (20) ---
+  ["Have you seen that new movie?","你看了那部新电影吗？","流行文化"],
+  ["I'm binge-watching a show right now.","我在追剧。","流行文化"],
+  ["That song is stuck in my head!","那首歌在我脑海里挥之不去！","流行文化"],
+  ["I'm a huge fan of K-pop!","我是韩流的超级粉丝！","流行文化"],
+  ["Did you watch the latest episode?","你看最新一集了吗？","流行文化"],
+  ["The concert was incredible!","演唱会太棒了！","流行文化"],
+  ["I love this TikTok trend!","我喜欢这个 TikTok 潮流！","流行文化"],
+  ["Who's your favorite actor?","你最喜欢的演员是谁？","流行文化"],
+  ["That show is overrated.","那部剧被高估了。","流行文化"],
+  ["I can't wait for the new season!","我等不及新季了！","流行文化"],
+  ["The soundtrack is amazing!","原声带太棒了！","流行文化"],
+  ["I cried watching that movie.","我看那部电影看哭了。","流行文化"],
+  ["This dance challenge is going viral!","这个舞蹈挑战火了！","流行文化"],
+  ["What are you streaming these days?","你最近在看什么？","流行文化"],
+  ["The plot twist caught me off guard!","那个剧情反转让我措手不及！","流行文化"],
+  ["I've had this song on repeat.","这首歌我单曲循环了。","流行文化"],
+  ["The special effects are mind-blowing!","特效太震撼了！","流行文化"],
+  ["I'm obsessed with this show!","我对这部剧着迷了！","流行文化"],
+  ["That actor is so talented!","那个演员太有才了！","流行文化"],
+  ["Let's go to the movies this weekend!","这周末去看电影吧！","流行文化"],
+
+  // --- 社交互动 Social (20) ---
+  ["Let's hang out sometime!","有空一起玩！","社交互动"],
+  ["I miss you!","我想你！","社交互动"],
+  ["It's so good to see you!","见到你太好了！","社交互动"],
+  ["We should catch up soon!","我们应该尽快聚聚！","社交互动"],
+  ["What are you up to this weekend?","这周末有什么安排？","社交互动"],
+  ["Let's grab coffee sometime.","有空一起喝咖啡。","社交互动"],
+  ["I'll text you later!","我晚点发消息给你！","社交互动"],
+  ["Are you free tonight?","今晚有空吗？","社交互动"],
+  ["Let's plan a get-together.","我们计划一次聚会吧。","社交互动"],
+  ["Sounds like a plan!","就这么定了！","社交互动"],
+  ["I had a great time!","我玩得很开心！","社交互动"],
+  ["Let's do this again sometime!","下次再约！","社交互动"],
+  ["Count me in!","算我一个！","社交互动"],
+  ["I'm down for whatever.","我什么都行。","社交互动"],
+  ["You crack me up!","你笑死我了！","社交互动"],
+  ["Tell me everything!","快跟我说说！","社交互动"],
+  ["I'm so happy for you!","为你高兴！","社交互动"],
+  ["Congratulations! I'm so proud of you!","恭喜！为你骄傲！","社交互动"],
+  ["Let me know if you need anything.","需要什么尽管说。","社交互动"],
+  ["I've got your back!","我支持你！","社交互动"]
+];
+
+// ========== Weather System ==========
+const weatherLocations = [
+  {name:'宝安', lat:22.5533, lon:113.8831},
+  {name:'南山', lat:22.5323, lon:113.9435}
+];
+
+function getWeatherInfo(code,isDay){
+  const map={
+    0:{icon:isDay?'☀️':'🌙',desc:'晴朗'},
+    1:{icon:isDay?'🌤️':'🌙',desc:' mainly clear'},
+    2:{icon:'⛅',desc:'多云'},
+    3:{icon:'☁️',desc:'阴天'},
+    45:{icon:'🌫️',desc:'雾'},
+    48:{icon:'🌫️',desc:'雾凇'},
+    51:{icon:'🌦️',desc:'毛毛雨'},
+    53:{icon:'🌦️',desc:'中度毛毛雨'},
+    55:{icon:'🌧️',desc:'密集毛毛雨'},
+    56:{icon:'🌧️',desc:'冻毛毛雨'},
+    57:{icon:'🌧️',desc:'强冻毛毛雨'},
+    61:{icon:'🌧️',desc:'小雨'},
+    63:{icon:'🌧️',desc:'中雨'},
+    65:{icon:'🌧️',desc:'大雨'},
+    66:{icon:'🌨️',desc:'冻雨'},
+    67:{icon:'🌨️',desc:'强冻雨'},
+    71:{icon:'❄️',desc:'小雪'},
+    73:{icon:'❄️',desc:'中雪'},
+    75:{icon:'❄️',desc:'大雪'},
+    77:{icon:'🌨️',desc:'雪粒'},
+    80:{icon:'🌦️',desc:'小阵雨'},
+    81:{icon:'🌦️',desc:'中阵雨'},
+    82:{icon:'🌧️',desc:'强阵雨'},
+    85:{icon:'🌨️',desc:'小阵雪'},
+    86:{icon:'🌨️',desc:'强阵雪'},
+    95:{icon:'⛈️',desc:'雷雨'},
+    96:{icon:'⛈️',desc:'雷暴伴冰雹'},
+    99:{icon:'⛈️',desc:'强雷暴伴冰雹'}
+  };
+  return map[code] || {icon:'🌡️',desc:'未知'};
+}
+
+function formatTimeLabel(){
+  const now=new Date();
+  return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+}
+
+async function fetchWeather(location){
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${location.lat}&longitude=${location.lon}&current_weather=true&daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Asia%2FShanghai`;
+  const res=await fetch(url);
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  return await res.json();
+}
+
+function renderWeatherCard(name, data){
+  const cw=data.current_weather;
+  const info=getWeatherInfo(cw.weathercode, cw.is_day);
+  const todayIdx=data.daily.time.indexOf(cw.time.split('T')[0]);
+  const maxTemp=todayIdx>=0?Math.round(data.daily.temperature_2m_max[todayIdx]):'--';
+  const minTemp=todayIdx>=0?Math.round(data.daily.temperature_2m_min[todayIdx]):'--';
+  const wind=Math.round(cw.windspeed);
+  return `
+    <div class="weather-location">
+      <div class="weather-loc-name">📍 深圳 · ${name}</div>
+      <div class="weather-main">
+        <div class="weather-icon">${info.icon}</div>
+        <div>
+          <div class="weather-temp">${Math.round(cw.temperature)}°C</div>
+          <div class="weather-desc">${info.desc}</div>
+        </div>
+      </div>
+      <div class="weather-detail">
+        <span>💨 ${wind}km/h</span>
+        <span>📈 ${maxTemp}°</span>
+        <span>📉 ${minTemp}°</span>
+      </div>
+    </div>
+  `;
+}
+
+async function refreshWeather(){
+  const grid=document.getElementById('weather-grid');
+  const updateEl=document.getElementById('weather-last-update');
+  if(grid) grid.innerHTML='<div class="weather-loading">正在获取天气数据...</div>';
+  try{
+    const results=await Promise.all(weatherLocations.map(async loc=>{
+      const data=await fetchWeather(loc);
+      return {name:loc.name, data};
+    }));
+    if(grid){
+      grid.innerHTML=results.map(r=>renderWeatherCard(r.name, r.data)).join('');
+    }
+    if(updateEl) updateEl.textContent='更新于 '+formatTimeLabel();
+    try{localStorage.setItem('wb_weather_cache',JSON.stringify({time:Date.now(),items:results}));}catch(e){}
+  }catch(err){
+    if(grid){
+      grid.innerHTML=`<div class="weather-error">天气获取失败，请检查网络后点击刷新重试。</div>`;
+    }
+    if(updateEl) updateEl.textContent='更新失败';
+  }
+}
+
+function loadWeatherCache(){
+  try{
+    const cached=JSON.parse(localStorage.getItem('wb_weather_cache')||'null');
+    if(cached && cached.items && Date.now()-cached.time < 30*60*1000){
+      const grid=document.getElementById('weather-grid');
+      if(grid) grid.innerHTML=cached.items.map(r=>renderWeatherCard(r.name, r.data)).join('');
+      const updateEl=document.getElementById('weather-last-update');
+      if(updateEl){
+        const d=new Date(cached.time);
+        updateEl.textContent='更新于 '+`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+      }
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
+// ========== Live Time & Activity ==========
+const schedule=[
+  {start:7*60, end:7.5*60, name:'🇬🇧 英语口语练习', color:'var(--c-english)', duration:'30min'},
+  {start:7.5*60, end:8*60, name:'🎤 唱歌练声', color:'var(--c-sing)', duration:'30min'},
+  {start:8.5*60, end:12*60, name:'🎨 设计工作', color:'var(--c-design)', duration:'3.5h'},
+  {start:13*60, end:14.5*60, name:'💪 健身训练', color:'var(--c-fitness)', duration:'1.5h'},
+  {start:15*60, end:16*60, name:'🤖 学习 AI 知识', color:'var(--c-ailearn)', duration:'1h'},
+  {start:16*60, end:18*60, name:'💃 跳舞训练', color:'var(--c-dance)', duration:'2h'},
+  {start:19*60, end:21*60, name:'📺 直播', color:'var(--c-stream)', duration:'2h'}
+];
+
+function getCurrentActivity(){
+  const now=new Date();
+  const minutes=now.getHours()*60+now.getMinutes();
+  for(const s of schedule){
+    if(minutes>=s.start && minutes<s.end){
+      const endH=Math.floor(s.end/60);
+      const endM=Math.round(s.end%60);
+      return {name:s.name, time:`${String(endH).padStart(2,'0')}:${String(endM).padStart(2,'0')} 结束 · ${s.duration}`, color:s.color, active:true};
+    }
+  }
+  let next=schedule.find(s=>s.start>minutes);
+  if(!next) next=schedule[0];
+  const startH=Math.floor(next.start/60);
+  const startM=Math.round(next.start%60);
+  return {name:next.name, time:`${String(startH).padStart(2,'0')}:${String(startM).padStart(2,'0')} 开始 · ${next.duration}`, color:next.color, active:false};
+}
+
+function updateTimeAndActivity(){
+  const now=new Date();
+  const clockEl=document.getElementById('live-clock');
+  const dateEl=document.getElementById('live-date');
+  const actEl=document.getElementById('live-activity');
+  const actTimeEl=document.getElementById('live-activity-time');
+  
+  if(clockEl) clockEl.textContent=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  if(dateEl){
+    const days=['周日','周一','周二','周三','周四','周五','周六'];
+    dateEl.textContent=`${now.getFullYear()}年${now.getMonth()+1}月${now.getDate()}日 ${days[now.getDay()]}`;
+  }
+  
+  const activity=getCurrentActivity();
+  if(actEl){
+    actEl.textContent=activity.active?`进行中：${activity.name}`:`下一项：${activity.name}`;
+    actEl.style.color=activity.color;
+  }
+  if(actTimeEl) actTimeEl.textContent=activity.time;
+}
+
+function updateOverviewProgress(){
+  const list=document.getElementById('overview-checklist');
+  if(!list) return;
+  const items=list.querySelectorAll('.checklist-item');
+  const total=items.length;
+  const done=list.querySelectorAll('.checklist-item.done').length;
+  const pct=total?Math.round(done/total*100):0;
+  const bar=document.getElementById('overview-progress');
+  const txt=document.getElementById('overview-progress-text');
+  if(bar) bar.style.width=pct+'%';
+  if(txt) txt.textContent=pct+'%';
+}
+
+const _originalToggleCheck=toggleCheck;
+toggleCheck=function(el){
+  el.classList.toggle('done');
+  saveChecklistState();
+  updateOverviewProgress();
+};
+
+// ========== Phrase System ==========
+const PHRASES_PER_DAY = 10;
+const startDate = new Date('2026-08-10');
+let currentDayIdx = 0;
+let learnedSet = new Set();
+
+function getTotalDays(){
+  return Math.ceil(phrases.length / PHRASES_PER_DAY);
+}
+
+function getTodayDayIdx(){
+  const today = new Date();
+  const diff = Math.floor((today - startDate) / (1000*60*60*24));
+  return diff % getTotalDays();
+}
+
+function getPhrasesForDay(dayIdx){
+  const start = dayIdx * PHRASES_PER_DAY;
+  return phrases.slice(start, start + PHRASES_PER_DAY);
+}
+
+function getDayCategory(dayIdx){
+  const dayPhrases = getPhrasesForDay(dayIdx);
+  if(dayPhrases.length > 0) return dayPhrases[0][2];
+  return '';
+}
+
+function loadLearnedSet(){
+  try{
+    const saved = JSON.parse(localStorage.getItem('wb_phrases_learned')||'[]');
+    learnedSet = new Set(saved);
+  }catch(e){learnedSet = new Set();}
+}
+
+function saveLearnedSet(){
+  try{localStorage.setItem('wb_phrases_learned',JSON.stringify([...learnedSet]));}catch(e){}
+  scheduleAutoSync();
+}
+
+function loadCurrentDay(){
+  const saved = localStorage.getItem('wb_phrase_day');
+  if(saved !== null){
+    currentDayIdx = parseInt(saved);
+  } else {
+    currentDayIdx = getTodayDayIdx();
+  }
+}
+
+function saveCurrentDay(){
+  try{localStorage.setItem('wb_phrase_day',String(currentDayIdx));}catch(e){}
+  scheduleAutoSync();
+}
+
+function renderPhrases(){
+  const list = document.getElementById('phrase-list');
+  if(!list) return;
+  const dayPhrases = getPhrasesForDay(currentDayIdx);
+  const startIdx = currentDayIdx * PHRASES_PER_DAY;
+  
+  list.innerHTML = dayPhrases.map((p, i) => {
+    const globalIdx = startIdx + i;
+    const isLearned = learnedSet.has(globalIdx);
+    return `
+      <div class="phrase-item ${isLearned?'learned':''}" onclick="togglePhrase(${globalIdx})">
+        <div class="phrase-num">${i+1}</div>
+        <div class="phrase-content">
+          <div class="pi-en">${p[0]}</div>
+          <div class="pi-cn">${p[1]}</div>
+          <span class="pi-cat">${p[2]}</span>
+        </div>
+        <div class="phrase-check">
+          <svg width="14" height="14" viewBox="0 0 14 14"><path d="M2 7L5 10L12 3" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    `;
+  }).join('');
+  
+  updatePhraseStats();
+}
+
+function togglePhrase(globalIdx){
+  if(learnedSet.has(globalIdx)){
+    learnedSet.delete(globalIdx);
+  } else {
+    learnedSet.add(globalIdx);
+  }
+  saveLearnedSet();
+  renderPhrases();
+}
+
+function changeDay(delta){
+  const totalDays = getTotalDays();
+  currentDayIdx = (currentDayIdx + delta + totalDays) % totalDays;
+  saveCurrentDay();
+  renderPhrases();
+}
+
+function goToday(){
+  currentDayIdx = getTodayDayIdx();
+  saveCurrentDay();
+  renderPhrases();
+}
+
+function markAllLearned(){
+  const startIdx = currentDayIdx * PHRASES_PER_DAY;
+  for(let i = 0; i < PHRASES_PER_DAY; i++){
+    learnedSet.add(startIdx + i);
+  }
+  saveLearnedSet();
+  renderPhrases();
+}
+
+function resetDay(){
+  const startIdx = currentDayIdx * PHRASES_PER_DAY;
+  for(let i = 0; i < PHRASES_PER_DAY; i++){
+    learnedSet.delete(startIdx + i);
+  }
+  saveLearnedSet();
+  renderPhrases();
+}
+
+function updatePhraseStats(){
+  const total = phrases.length;
+  const learned = learnedSet.size;
+  const percent = Math.round(learned / total * 100);
+  const category = getDayCategory(currentDayIdx);
+  
+  const elTotal = document.getElementById('phrase-total');
+  const elLearned = document.getElementById('phrase-learned');
+  const elDay = document.getElementById('phrase-day');
+  const elPercent = document.getElementById('phrase-percent');
+  const elProgress = document.getElementById('phrase-progress');
+  const elBadge = document.getElementById('phrase-day-badge');
+  const elPrev = document.getElementById('phrase-prev');
+  const elNext = document.getElementById('phrase-next');
+  
+  if(elTotal) elTotal.textContent = total;
+  if(elLearned) elLearned.textContent = learned;
+  if(elDay) elDay.textContent = 'Day ' + (currentDayIdx + 1);
+  if(elPercent) elPercent.textContent = percent + '%';
+  if(elProgress) elProgress.style.width = percent + '%';
+  if(elBadge) elBadge.textContent = `Day ${currentDayIdx+1} · ${category}`;
+  if(elPrev) elPrev.disabled = false;
+  if(elNext) elNext.disabled = false;
+}
+
+// ========== Timeline Task Tracking ==========
+function toggleTimelineTask(el, taskName){
+  el.classList.toggle('done');
+  const item = el.closest('.timeline-item');
+  if(el.classList.contains('done')){
+    item.classList.add('task-done');
+    item.classList.remove('task-skipped','task-delayed');
+  } else {
+    item.classList.remove('task-done');
+  }
+  saveTimelineState();
+  updateTimelineSummary();
+}
+
+function saveTimelineState(){
+  const state = {};
+  document.querySelectorAll('#overview-timeline .timeline-item').forEach(item=>{
+    const task = item.dataset.task;
+    const check = item.querySelector('.tl-check');
+    state[task] = {
+      done: check ? check.classList.contains('done') : false,
+      skipped: item.classList.contains('task-skipped'),
+      delayed: item.classList.contains('task-delayed')
+    };
+  });
+  try{ localStorage.setItem('wb_timeline_tasks', JSON.stringify(state)); }catch(e){}
+  scheduleAutoSync();
+}
+
+function loadTimelineState(){
+  try{
+    const state = JSON.parse(localStorage.getItem('wb_timeline_tasks') || '{}');
+    document.querySelectorAll('#overview-timeline .timeline-item').forEach(item=>{
+      const task = item.dataset.task;
+      if(state[task]){
+        const check = item.querySelector('.tl-check');
+        if(state[task].done && check){
+          check.classList.add('done');
+          item.classList.add('task-done');
+        }
+        if(state[task].skipped) item.classList.add('task-skipped');
+        if(state[task].delayed) item.classList.add('task-delayed');
+      }
+    });
+  }catch(e){}
+}
+
+function updateTimelineSummary(){
+  const items = document.querySelectorAll('#overview-timeline .timeline-item');
+  let completed = 0;
+  let total = items.length;
+  items.forEach(item=>{
+    const check = item.querySelector('.tl-check');
+    if(check && check.classList.contains('done')) completed++;
+  });
+  const pct = total > 0 ? Math.round(completed / total * 100) : 0;
+  const elCount = document.getElementById('tl-completed-count');
+  const elFill = document.getElementById('tl-progress-fill');
+  const elPct = document.getElementById('tl-progress-pct');
+  if(elCount) elCount.textContent = `已完成 ${completed} / ${total} 项`;
+  if(elFill) elFill.style.width = pct + '%';
+  if(elPct) elPct.textContent = pct + '%';
+}
+
+function adjustUncompletedTasks(){
+  const items = document.querySelectorAll('#overview-timeline .timeline-item');
+  let uncompleted = [];
+  items.forEach(item=>{
+    const check = item.querySelector('.tl-check');
+    const task = item.dataset.task;
+    if(check && !check.classList.contains('done') && task !== 'sleep'){
+      uncompleted.push({item, task, start: item.dataset.start, duration: item.dataset.duration});
+    }
+  });
+  if(uncompleted.length === 0){
+    alert('🎉 全部任务已完成！无需调整。');
+    return;
+  }
+  const taskNames = {
+    english:'英语口语', sing:'唱歌练声', design:'设计工作', fitness:'健身训练',
+    ailearn:'AI学习', dance:'跳舞训练', stream:'直播', review:'每日复盘'
+  };
+  let msg = `📋 以下 ${uncompleted.length} 项任务未完成：\n\n`;
+  uncompleted.forEach((u,i)=>{
+    msg += `${i+1}. ${taskNames[u.task] || u.task}（计划 ${u.start}，${u.duration}分钟）\n`;
+  });
+  msg += `\n选择调整方式：\n• 输入"延后"→ 标记为延后，明日优先处理\n• 输入"跳过"→ 标记为跳过，记录原因\n• 输入具体时间（如"20:00"）→ 调整到新时间`;
+  const input = prompt(msg);
+  if(!input) return;
+  const action = input.trim().toLowerCase();
+  uncompleted.forEach(u=>{
+    if(action === '延后' || action === 'delay'){
+      u.item.classList.add('task-delayed');
+      const check = u.item.querySelector('.tl-check');
+      if(check){
+        check.style.borderColor = '#f59e0b';
+        check.title = '已延后 - 明日优先处理';
+      }
+    } else if(action === '跳过' || action === 'skip'){
+      u.item.classList.add('task-skipped');
+      const check = u.item.querySelector('.tl-check');
+      if(check){
+        check.style.borderColor = '#ef4444';
+        check.title = '已跳过';
+      }
+    } else if(/^\d{1,2}:\d{2}$/.test(input.trim())){
+      const timeEl = u.item.querySelector('.timeline-time');
+      if(timeEl) timeEl.textContent = input.trim();
+      u.item.dataset.start = input.trim();
+      u.item.classList.add('task-delayed');
+    }
+  });
+  saveTimelineState();
+  updateTimelineSummary();
+}
+
+// ========== Daily Review System ==========
+const reviewFields = [
+  'review-conclusion', 'review-tomorrow',
+  'kiss-keep-fact', 'kiss-keep-judge', 'kiss-keep-action',
+  'kiss-improve-fact', 'kiss-improve-judge', 'kiss-improve-action',
+  'kiss-stop-fact', 'kiss-stop-judge', 'kiss-stop-action',
+  'kiss-start-fact', 'kiss-start-judge', 'kiss-start-action',
+  'grai-goal', 'grai-result', 'grai-analysis', 'grai-insight',
+  'review-cognition', 'review-automation', 'review-pending', 'review-failed'
+];
+
+let reviewEditMode = false;
+
+function getTodayKey(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function loadReview(){
+  try{
+    const data = JSON.parse(localStorage.getItem('wb_review_' + getTodayKey()) || '{}');
+    reviewFields.forEach(field=>{
+      const display = document.getElementById(field + '-display');
+      const input = document.getElementById(field + '-input');
+      const value = data[field] || '';
+      if(display){
+        display.textContent = value || (field === 'review-conclusion' ? '暂未填写 — 点击下方编辑' :
+                                       field === 'review-tomorrow' ? '暂未填写' :
+                                       field.includes('kiss') || field.includes('grai') ? '— 暂未填写 —' :
+                                       field === 'review-pending' ? '暂无待确认问题' :
+                                       field === 'review-failed' ? '暂无未执行项' :
+                                       field === 'review-cognition' ? '暂无新增认知' :
+                                       field === 'review-automation' ? '暂无自动化机会' : '—');
+      }
+      if(input) input.value = value;
+    });
+    renderReviewHistory();
+  }catch(e){}
+}
+
+function toggleReviewEditMode(){
+  reviewEditMode = !reviewEditMode;
+  reviewFields.forEach(field=>{
+    const display = document.getElementById(field + '-display');
+    const input = document.getElementById(field + '-input');
+    if(display) display.style.display = reviewEditMode ? 'none' : '';
+    if(input) input.style.display = reviewEditMode ? '' : 'none';
+  });
+  const btn = document.getElementById('review-edit-btn');
+  if(btn) btn.textContent = reviewEditMode ? '👁️ 预览' : '✏️ 编辑';
+}
+
+function saveReview(){
+  const data = {};
+  data._savedAt = new Date().toISOString();
+  reviewFields.forEach(field=>{
+    const input = document.getElementById(field + '-input');
+    if(input) data[field] = input.value.trim();
+  });
+  try{
+    localStorage.setItem('wb_review_' + getTodayKey(), JSON.stringify(data));
+    loadReview();
+    toggleReviewEditMode();
+    const info = document.getElementById('review-save-info');
+    if(info) info.textContent = '✅ 已保存 · ' + new Date().toLocaleTimeString('zh-CN');
+    setTimeout(()=>{
+      const info2 = document.getElementById('review-save-info');
+      if(info2) info2.textContent = '📝 复盘数据保存在本地浏览器 · 每日自动归档';
+    }, 3000);
+    renderReviewHistory();
+    scheduleAutoSync();
+  }catch(e){
+    alert('保存失败：' + e.message);
+  }
+}
+
+function renderReviewHistory(){
+  const list = document.getElementById('review-history-list');
+  if(!list) return;
+  const keys = Object.keys(localStorage).filter(k=>k.startsWith('wb_review_')).sort().reverse();
+  if(keys.length === 0){
+    list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--text-secondary);font-size:13px;">暂无历史记录 · 完成今日复盘后自动保存</div>';
+    return;
+  }
+  let html = '';
+  keys.slice(0, 14).forEach(key=>{
+    const dateStr = key.replace('wb_review_', '');
+    let data;
+    try{ data = JSON.parse(localStorage.getItem(key)); }catch(e){ return; }
+    const conclusion = data['review-conclusion'] || '（未填写结论）';
+    const tomorrow = data['review-tomorrow'] || '';
+    html += `<div class="review-history-item" onclick="loadHistoryReview('${dateStr}')">
+      <div class="review-history-date">📅 ${dateStr}</div>
+      <div class="review-history-preview">${conclusion.substring(0,80)}${conclusion.length>80?'...':''}${tomorrow?'<br>🔥 明日行动: '+tomorrow.substring(0,50):''}</div>
+    </div>`;
+  });
+  list.innerHTML = html;
+}
+
+function loadHistoryReview(dateStr){
+  try{
+    const data = JSON.parse(localStorage.getItem('wb_review_' + dateStr) || '{}');
+    reviewFields.forEach(field=>{
+      const input = document.getElementById(field + '-input');
+      if(input) input.value = data[field] || '';
+    });
+    if(!reviewEditMode) toggleReviewEditMode();
+    const info = document.getElementById('review-save-info');
+    if(info) info.textContent = `📋 正在查看 ${dateStr} 的复盘 · 修改后保存会覆盖当日记录`;
+    window.scrollTo({top: 0, behavior: 'smooth'});
+  }catch(e){}
+}
+
+// ========== Data Management: Export / Import / Cloud Sync ==========
+
+// --- All localStorage keys used by this app ---
+const WB_DATA_KEYS = [
+  'wb_checklist',
+  'wb_timeline_tasks',
+  'wb_phrases_learned',
+  'wb_phrase_day',
+  'wb_weather_cache'
+];
+const WB_REVIEW_PREFIX = 'wb_review_';
+
+// --- Get all data keys including review keys ---
+function getAllDataKeys(){
+  const reviewKeys = Object.keys(localStorage).filter(k=>k.startsWith(WB_REVIEW_PREFIX));
+  return [...WB_DATA_KEYS, ...reviewKeys];
+}
+
+// --- Format byte size ---
+function formatBytes(bytes){
+  if(bytes < 1024) return bytes + ' B';
+  if(bytes < 1024*1024) return (bytes/1024).toFixed(1) + ' KB';
+  return (bytes/(1024*1024)).toFixed(2) + ' MB';
+}
+
+// --- Refresh data overview ---
+function refreshDataOverview(){
+  const sizes = {
+    checklist: 0, timeline: 0, phrases: 0, weather: 0, reviews: 0
+  };
+  let total = 0;
+
+  WB_DATA_KEYS.forEach(key => {
+    const val = localStorage.getItem(key) || '';
+    const size = new Blob([val]).size;
+    total += size;
+    if(key === 'wb_checklist') sizes.checklist = size;
+    if(key === 'wb_timeline_tasks') sizes.timeline = size;
+    if(key === 'wb_phrases_learned' || key === 'wb_phrase_day') sizes.phrases += size;
+    if(key === 'wb_weather_cache') sizes.weather = size;
+  });
+
+  const reviewKeys = Object.keys(localStorage).filter(k=>k.startsWith(WB_REVIEW_PREFIX));
+  reviewKeys.forEach(key => {
+    const val = localStorage.getItem(key) || '';
+    const size = new Blob([val]).size;
+    sizes.reviews += size;
+    total += size;
+  });
+
+  document.getElementById('dm-size-checklist').textContent = formatBytes(sizes.checklist);
+  document.getElementById('dm-size-timeline').textContent = formatBytes(sizes.timeline);
+  document.getElementById('dm-size-phrases').textContent = formatBytes(sizes.phrases);
+  document.getElementById('dm-size-weather').textContent = formatBytes(sizes.weather);
+  document.getElementById('dm-size-reviews').textContent = formatBytes(sizes.reviews) + ` (${reviewKeys.length} 条)`;
+  document.getElementById('dm-size-total').textContent = formatBytes(total);
+}
+
+// --- Export backup ---
+function exportBackup(){
+  try{
+    const data = {};
+    const allKeys = getAllDataKeys();
+    allKeys.forEach(key => {
+      const val = localStorage.getItem(key);
+      if(val !== null) data[key] = val;
+    });
+
+    const backup = {
+      version: '2.0',
+      exportDate: new Date().toISOString(),
+      appVersion: 'workbench-v2',
+      dataCount: allKeys.length,
+      data: data
+    };
+
+    const jsonStr = JSON.stringify(backup, null, 2);
+    const blob = new Blob([jsonStr], {type: 'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const dateStr = new Date().toISOString().slice(0,10);
+    a.href = url;
+    a.download = `workbench-backup-${dateStr}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showDmStatus('dm-export-status', 'success', `✅ 备份已导出！包含 ${allKeys.length} 项数据，文件已下载到你的设备。`);
+  }catch(e){
+    showDmStatus('dm-export-status', 'error', `❌ 导出失败：${e.message}`);
+  }
+}
+
+// --- Import backup ---
+function importBackup(event){
+  const file = event.target.files[0];
+  if(!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const backup = JSON.parse(e.target.result);
+
+      if(!backup.data || typeof backup.data !== 'object'){
+        showDmStatus('dm-import-status', 'error', '❌ 文件格式不正确，请选择工作台导出的备份文件。');
+        return;
+      }
+
+      if(!confirm(`确认导入备份？\n\n备份日期：${backup.exportDate || '未知'}\n数据项数：${Object.keys(backup.data).length}\n\n⚠️ 导入将覆盖当前所有本地数据，此操作不可撤销！\n\n建议在导入前先导出当前数据作为备份。`)){
+        event.target.value = '';
+        return;
+      }
+
+      // Clear existing workbench data first
+      const existingKeys = getAllDataKeys();
+      existingKeys.forEach(key => localStorage.removeItem(key));
+
+      // Write imported data
+      let count = 0;
+      Object.keys(backup.data).forEach(key => {
+        localStorage.setItem(key, backup.data[key]);
+        count++;
+      });
+
+      showDmStatus('dm-import-status', 'success', `✅ 备份已导入！恢复 ${count} 项数据。页面将在 2 秒后刷新...`);
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+
+    }catch(err){
+      showDmStatus('dm-import-status', 'error', `❌ 导入失败：${err.message}`);
+    }
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+// --- Clear local data ---
+function clearLocalData(){
+  if(!confirm('⚠️ 确认清空所有本地数据？\n\n这将删除：\n• 任务勾选状态\n• 时间轴完成状态\n• 英语口语进度\n• 天气缓存\n• 所有每日复盘记录\n\n此操作不可撤销！建议先导出备份。\n\n确认清空吗？')){
+    return;
+  }
+  if(!confirm('再次确认：真的要清空全部本地数据吗？')){
+    return;
+  }
+  const allKeys = getAllDataKeys();
+  allKeys.forEach(key => localStorage.removeItem(key));
+  showDmStatus('dm-clear-status', 'success', '✅ 本地数据已清空。页面将在 2 秒后刷新...');
+  setTimeout(() => window.location.reload(), 2000);
+}
+
+// --- Show status message ---
+function showDmStatus(elementId, type, message){
+  const el = document.getElementById(elementId);
+  if(!el) return;
+  el.className = `dm-status show ${type}`;
+  el.textContent = message;
+}
+
+// ========== Cloud Sync (Supabase) ==========
+
+let supabaseClient = null;
+let autoSyncTimer = null;
+
+// --- Get Supabase config from localStorage ---
+function getSupabaseConfig(){
+  return {
+    url: localStorage.getItem('wb_supabase_url') || '',
+    key: localStorage.getItem('wb_supabase_key') || ''
+  };
+}
+
+// --- Save Supabase config ---
+function saveSupabaseConfig(url, key){
+  localStorage.setItem('wb_supabase_url', url);
+  localStorage.setItem('wb_supabase_key', key);
+}
+
+// --- Connect to Supabase ---
+function connectSupabase(){
+  const url = document.getElementById('supabase-url').value.trim();
+  const key = document.getElementById('supabase-key').value.trim();
+
+  if(!url || !key){
+    showDmStatus('cloud-connect-status', 'error', '❌ 请填写 Supabase Project URL 和 Anon Key');
+    return;
+  }
+
+  if(!url.startsWith('https://') || !url.includes('.supabase.co')){
+    showDmStatus('cloud-connect-status', 'error', '❌ URL 格式不正确，应为 https://xxxxx.supabase.co 格式');
+    return;
+  }
+
+  try{
+    if(typeof window.supabase === 'undefined' || !window.supabase.createClient){
+      showDmStatus('cloud-connect-status', 'error', '❌ Supabase SDK 加载失败，请检查网络连接后刷新页面重试');
+      return;
+    }
+
+    supabaseClient = window.supabase.createClient(url, key);
+
+    // Test connection by checking auth session
+    supabaseClient.auth.getSession().then(({data, error}) => {
+      if(error){
+        showDmStatus('cloud-connect-status', 'error', `❌ 连接失败：${error.message}`);
+        return;
+      }
+
+      saveSupabaseConfig(url, key);
+      showDmStatus('cloud-connect-status', 'success', '✅ Supabase 连接成功！');
+
+      if(data.session){
+        // Already logged in
+        showCloudConnected(data.session.user);
+      }else{
+        // Show auth section
+        document.getElementById('cloud-auth-section').style.display = 'block';
+      }
+    });
+  }catch(e){
+    showDmStatus('cloud-connect-status', 'error', `❌ 初始化失败：${e.message}`);
+  }
+}
+
+// --- Sign in ---
+async function cloudSignIn(){
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+
+  if(!email || !password){
+    showDmStatus('cloud-auth-status', 'error', '❌ 请填写邮箱和密码');
+    return;
+  }
+
+  showDmStatus('cloud-auth-status', 'info', '⏳ 正在登录...');
+
+  try{
+    const {data, error} = await supabaseClient.auth.signInWithPassword({email, password});
+    if(error) throw error;
+
+    showDmStatus('cloud-auth-status', 'success', '✅ 登录成功！');
+    setTimeout(() => {
+      document.getElementById('cloud-auth-section').style.display = 'none';
+      showCloudConnected(data.user);
+    }, 1000);
+  }catch(e){
+    showDmStatus('cloud-auth-status', 'error', `❌ 登录失败：${e.message}`);
+  }
+}
+
+// --- Sign up ---
+async function cloudSignUp(){
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+
+  if(!email || !password){
+    showDmStatus('cloud-auth-status', 'error', '❌ 请填写邮箱和密码');
+    return;
+  }
+  if(password.length < 6){
+    showDmStatus('cloud-auth-status', 'error', '❌ 密码至少 6 位');
+    return;
+  }
+
+  showDmStatus('cloud-auth-status', 'info', '⏳ 正在注册...');
+
+  try{
+    const {data, error} = await supabaseClient.auth.signUp({email, password});
+    if(error) throw error;
+
+    if(data.session){
+      // Auto-confirmed, logged in
+      showDmStatus('cloud-auth-status', 'success', '✅ 注册成功，已自动登录！');
+      setTimeout(() => {
+        document.getElementById('cloud-auth-section').style.display = 'none';
+        showCloudConnected(data.user);
+      }, 1000);
+    }else{
+      showDmStatus('cloud-auth-status', 'success', '✅ 注册成功！请检查邮箱确认链接，确认后再登录。');
+    }
+  }catch(e){
+    showDmStatus('cloud-auth-status', 'error', `❌ 注册失败：${e.message}`);
+  }
+}
+
+// --- Logout ---
+async function cloudLogout(){
+  if(!confirm('确认退出登录？本地数据不会被删除，但自动同步将停止。')) return;
+  try{
+    await supabaseClient.auth.signOut();
+    window.location.reload();
+  }catch(e){
+    console.error('Logout error:', e);
+    window.location.reload();
+  }
+}
+
+// --- Show connected state ---
+function showCloudConnected(user){
+  document.getElementById('cloud-not-connected').style.display = 'none';
+  document.getElementById('cloud-connected').style.display = 'block';
+  document.getElementById('cloud-user-email').textContent = user.email || '已登录';
+
+  // Update sidebar badge
+  const navStatus = document.getElementById('nav-sync-status');
+  if(navStatus) navStatus.textContent = '已连接';
+
+  // Update cloud badge
+  const badgeWrapper = document.getElementById('cloud-badge-wrapper');
+  if(badgeWrapper){
+    badgeWrapper.innerHTML = '<span class="cloud-status-badge online"><span class="dot"></span>已连接</span>';
+  }
+
+  // Show last sync time
+  const lastSync = localStorage.getItem('wb_last_cloud_sync');
+  if(lastSync){
+    document.getElementById('cloud-last-sync').textContent = `上次同步：${new Date(parseInt(lastSync)).toLocaleString('zh-CN')}`;
+  }
+
+  // Restore auto-sync setting
+  const autoSync = localStorage.getItem('wb_auto_sync') === 'true';
+  const toggle = document.getElementById('auto-sync-toggle');
+  if(toggle) toggle.checked = autoSync;
+  if(autoSync) startAutoSync();
+}
+
+// --- Sync data to cloud ---
+async function syncToCloud(){
+  if(!supabaseClient) return;
+
+  const {data: {session}} = await supabaseClient.auth.getSession();
+  if(!session){
+    addSyncLog('❌ 未登录，无法同步');
+    return;
+  }
+
+  addSyncLog('⬆️ 开始上传数据到云端...');
+
+  try{
+    const allKeys = getAllDataKeys();
+    const batch = allKeys.map(key => ({
+      user_id: session.user.id,
+      data_key: key,
+      data_value: localStorage.getItem(key) || '',
+      updated_at: new Date().toISOString()
+    }));
+
+    const {error} = await supabaseClient
+      .from('workbench_data')
+      .upsert(batch, {onConflict: 'user_id,data_key'});
+
+    if(error) throw error;
+
+    const now = Date.now();
+    localStorage.setItem('wb_last_cloud_sync', String(now));
+    document.getElementById('cloud-last-sync').textContent = `上次同步：${new Date(now).toLocaleString('zh-CN')}`;
+    addSyncLog(`✅ 上传完成！共同步 ${allKeys.length} 项数据`);
+  }catch(e){
+    addSyncLog(`❌ 上传失败：${e.message}`);
+  }
+}
+
+// --- Sync data from cloud ---
+async function syncFromCloud(){
+  if(!supabaseClient) return;
+
+  if(!confirm('从云端拉取数据将覆盖本地当前数据。\n\n建议先导出当前数据作为备份。\n\n确认拉取吗？')){
+    return;
+  }
+
+  const {data: {session}} = await supabaseClient.auth.getSession();
+  if(!session){
+    addSyncLog('❌ 未登录，无法同步');
+    return;
+  }
+
+  addSyncLog('⬇️ 开始从云端拉取数据...');
+
+  try{
+    const {data, error} = await supabaseClient
+      .from('workbench_data')
+      .select('data_key, data_value')
+      .eq('user_id', session.user.id);
+
+    if(error) throw error;
+
+    if(!data || data.length === 0){
+      addSyncLog('⚠️ 云端没有数据，可能是首次同步。请先点击「上传到云端」');
+      return;
+    }
+
+    // Clear local data first
+    const localKeys = getAllDataKeys();
+    localKeys.forEach(key => localStorage.removeItem(key));
+
+    // Write cloud data to local
+    data.forEach(row => {
+      if(row.data_key && row.data_value){
+        localStorage.setItem(row.data_key, row.data_value);
+      }
+    });
+
+    const now = Date.now();
+    localStorage.setItem('wb_last_cloud_sync', String(now));
+    addSyncLog(`✅ 拉取完成！恢复 ${data.length} 项数据，页面将在 2 秒后刷新...`);
+
+    setTimeout(() => window.location.reload(), 2000);
+  }catch(e){
+    addSyncLog(`❌ 拉取失败：${e.message}`);
+  }
+}
+
+// --- Auto sync ---
+function toggleAutoSync(checkbox){
+  const enabled = checkbox.checked;
+  localStorage.setItem('wb_auto_sync', String(enabled));
+  if(enabled){
+    startAutoSync();
+    addSyncLog('✅ 自动同步已开启');
+  }else{
+    stopAutoSync();
+    addSyncLog('⏸️ 自动同步已暂停');
+  }
+}
+
+function startAutoSync(){
+  stopAutoSync();
+  // Sync every 5 minutes
+  autoSyncTimer = setInterval(() => {
+    syncToCloud();
+  }, 5 * 60 * 1000);
+}
+
+function stopAutoSync(){
+  if(autoSyncTimer){
+    clearInterval(autoSyncTimer);
+    autoSyncTimer = null;
+  }
+}
+
+// --- Add sync log entry ---
+function addSyncLog(message){
+  const logEl = document.getElementById('cloud-sync-log');
+  if(!logEl) return;
+  logEl.classList.add('show');
+  const time = new Date().toLocaleTimeString('zh-CN');
+  const entry = document.createElement('div');
+  entry.className = 'log-entry';
+  entry.textContent = `[${time}] ${message}`;
+  logEl.insertBefore(entry, logEl.firstChild);
+
+  // Keep only last 50 entries
+  while(logEl.children.length > 50){
+    logEl.removeChild(logEl.lastChild);
+  }
+}
+
+// --- Auto-sync on data change (debounced) ---
+let syncChangeTimer = null;
+function scheduleAutoSync(){
+  if(localStorage.getItem('wb_auto_sync') !== 'true') return;
+  if(!supabaseClient) return;
+  if(syncChangeTimer) clearTimeout(syncChangeTimer);
+  syncChangeTimer = setTimeout(() => {
+    syncToCloud();
+  }, 3000); // 3 second debounce
+}
+
+// --- Initialize cloud sync on page load ---
+function initCloudSync(){
+  const config = getSupabaseConfig();
+  if(config.url && config.key){
+    // Pre-fill inputs
+    const urlInput = document.getElementById('supabase-url');
+    const keyInput = document.getElementById('supabase-key');
+    if(urlInput) urlInput.value = config.url;
+    if(keyInput) keyInput.value = config.key;
+
+    try{
+      if(typeof window.supabase !== 'undefined' && window.supabase.createClient){
+        supabaseClient = window.supabase.createClient(config.url, config.key);
+
+        // Check if already logged in
+        supabaseClient.auth.getSession().then(({data}) => {
+          if(data.session){
+            showCloudConnected(data.session.user);
+          }
+        });
+      }
+    }catch(e){
+      console.error('Cloud sync init error:', e);
+    }
+  }
+
+  // Update sidebar badge
+  const navStatus = document.getElementById('nav-sync-status');
+  if(navStatus && !supabaseClient){
+    navStatus.textContent = '未连接';
+  }
+}
+
+// ========== Init ==========
+loadChecklistState();
+loadLearnedSet();
+loadCurrentDay();
+renderPhrases();
+loadWeatherCache() || refreshWeather();
+updateTimeAndActivity();
+updateOverviewProgress();
+loadTimelineState();
+updateTimelineSummary();
+loadReview();
+refreshDataOverview();
+initCloudSync();
+setInterval(updateTimeAndActivity, 1000);
+setInterval(updateOverviewProgress, 30000);
+setInterval(refreshWeather, 30*60*1000);
+setInterval(updateTimelineSummary, 30000);
+setInterval(refreshDataOverview, 60000);
+
+// ========== Service Worker (Offline Support) ==========
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').then(function(reg){
+    console.log('SW registered:', reg.scope);
+  }).catch(function(err){
+    console.log('SW registration failed:', err);
+  });
+}
+</script>
+
+</body>
+</html>
