@@ -1379,6 +1379,28 @@ input,textarea{font-family:inherit;}
   .ai-chat-messages{max-height:360px;}
   .ai-msg{max-width:92%;}
 }
+
+/* ===== Design Gallery: 今日设计热作 ===== */
+.design-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+@media(max-width:768px){.design-gallery{grid-template-columns:1fr;}}
+.dg-column{display:flex;flex-direction:column;gap:10px;}
+.dg-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px;}
+.dg-header-title{font-weight:600;font-size:14px;display:flex;align-items:center;gap:6px;}
+.dg-header-link{font-size:11px;color:var(--text-tertiary);text-decoration:none;}
+.dg-header-link:hover{color:var(--accent);}
+.dg-card{border-radius:var(--radius-sm);overflow:hidden;background:var(--bg-card);border:1px solid var(--border-light);transition:box-shadow .2s,transform .2s;text-decoration:none;display:block;color:inherit;}
+.dg-card:hover{box-shadow:0 4px 12px rgba(0,0,0,.1);transform:translateY(-2px);}
+.dg-card-img{width:100%;height:140px;object-fit:cover;display:block;background:var(--bg-hover);}
+.dg-card-body{padding:8px 10px;}
+.dg-card-title{font-size:12px;font-weight:500;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:2px;}
+.dg-card-meta{font-size:11px;color:var(--text-tertiary);}
+.dg-skeleton{height:140px;border-radius:var(--radius-sm);background:linear-gradient(90deg,var(--bg-hover) 25%,var(--bg-card) 50%,var(--bg-hover) 75%);background-size:200% 100%;animation:dg-shimmer 1.5s infinite;}
+.dg-skeleton-body{height:36px;margin-top:8px;margin-bottom:8px;border-radius:4px;background:linear-gradient(90deg,var(--bg-hover) 25%,var(--bg-card) 50%,var(--bg-hover) 75%);background-size:200% 100%;animation:dg-shimmer 1.5s infinite;}
+@keyframes dg-shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+.dg-fallback{text-align:center;padding:20px 8px;font-size:12px;color:var(--text-tertiary);border:1px dashed var(--border-light);border-radius:var(--radius-sm);}
+.dg-fallback a{color:var(--accent);text-decoration:none;font-weight:500;}
+.dg-refresh{font-size:11px;color:var(--accent);cursor:pointer;text-decoration:underline;}
+.dg-refresh:hover{opacity:.7;}
 </style>
 </head>
 <body>
@@ -1745,27 +1767,41 @@ input,textarea{font-family:inherit;}
           <div class="lc-desc">字节跳动旗下 AI 创作平台，支持文生图、图生视频、智能编辑，免费使用，中文友好</div>
           <div class="lc-url">jimeng.jianying.com</div>
         </a>
-        <a class="link-card" href="https://www.zcool.com.cn" target="_blank">
-          <div class="lc-top"><span class="lc-icon">🖼️</span><span class="lc-name">站酷网站</span><span class="lc-arrow">↗</span></div>
-          <div class="lc-desc">中国设计师专业平台，汇聚千万设计师作品、灵感素材、设计教程，国内最大设计社区</div>
-          <div class="lc-url">zcool.com.cn</div>
-        </a>
-        <a class="link-card" href="https://dribbble.com" target="_blank">
-          <div class="lc-top"><span class="lc-icon">🏀</span><span class="lc-name">Dribbble</span><span class="lc-arrow">↗</span></div>
-          <div class="lc-desc">全球设计师作品分享社区，UI/UX、插画、品牌设计灵感发现，紧跟国际设计趋势</div>
-          <div class="lc-url">dribbble.com</div>
-        </a>
-        <a class="link-card" href="https://www.japandesign.ne.jp" target="_blank">
-          <div class="lc-top"><span class="lc-icon">🇯🇵</span><span class="lc-name">Japan Design</span><span class="lc-arrow">↗</span></div>
-          <div class="lc-desc">日本设计资讯门户，汇聚日本顶尖设计案例、展览信息、创意灵感，日式美学参考必备</div>
-          <div class="lc-url">japandesign.ne.jp</div>
-        </a>
         <a class="link-card" href="https://www.workbuddy.cn" target="_blank">
           <div class="lc-top"><span class="lc-icon">🤖</span><span class="lc-name">WorkBuddy</span><span class="lc-arrow">↗</span></div>
           <div class="lc-desc">AI 助手，辅助设计方案生成、文案撰写、创意brainstorm，支持多轮对话迭代</div>
           <div class="lc-url">workbuddy.cn</div>
         </a>
       </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🔥 今日设计热作</div>
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:12px;">站酷 · Dribbble · Japan Design 三大平台最新热门作品实时加载 <span class="dg-refresh" onclick="loadDesignWorks(true)">🔄 刷新</span></div>
+      <div class="design-gallery" id="design-gallery">
+        <div class="dg-column">
+          <div class="dg-header">
+            <span class="dg-header-title">🖼️ 站酷</span>
+            <a class="dg-header-link" href="https://www.zcool.com.cn/discover" target="_blank">查看更多 ↗</a>
+          </div>
+          <div id="dg-zcool"></div>
+        </div>
+        <div class="dg-column">
+          <div class="dg-header">
+            <span class="dg-header-title">🏀 Dribbble</span>
+            <a class="dg-header-link" href="https://dribbble.com/shots/popular" target="_blank">查看更多 ↗</a>
+          </div>
+          <div id="dg-dribbble"></div>
+        </div>
+        <div class="dg-column">
+          <div class="dg-header">
+            <span class="dg-header-title">🇯🇵 Japan Design</span>
+            <a class="dg-header-link" href="https://www.japandesign.ne.jp" target="_blank">查看更多 ↗</a>
+          </div>
+          <div id="dg-japan"></div>
+        </div>
+      </div>
+      <div style="margin-top:10px;font-size:11px;color:var(--text-tertiary);">💡 数据通过 CORS 代理从各网站实时获取，每小时缓存一次。如加载失败请点击「刷新」重试。</div>
     </div>
 
     <div class="card">
@@ -4674,11 +4710,187 @@ loadReview();
 refreshDataOverview();
 initCloudSync();
 loadAiConfig();
+loadDesignWorks();
 setInterval(updateTimeAndActivity, 1000);
 setInterval(updateOverviewProgress, 30000);
 setInterval(refreshWeather, 30*60*1000);
 setInterval(updateTimelineSummary, 30000);
 setInterval(refreshDataOverview, 60000);
+
+// ========== Design Gallery: 今日设计热作 ==========
+var DG_CACHE_KEY='wb_design_gallery_cache';
+var DG_CACHE_TIME=60*60*1000;
+var DG_PROXY='https://api.allorigins.win/raw?url=';
+var DG_FALLBACK_IMG="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='140'%3E%3Crect fill='%23f5f5f7' width='100%25' height='100%25'/%3E%3Ctext fill='%23999' font-size='13' x='50%25' y='50%25' text-anchor='middle' dy='.35em'%3ENo Preview%3C/text%3E%3C/svg%3E";
+
+function dgEscapeHtml(t){var d=document.createElement('div');d.textContent=t;return d.innerHTML;}
+
+function dgCardHtml(w,defaultAuthor){
+  return '<a class="dg-card" href="'+w.url+'" target="_blank">'+
+    '<img class="dg-card-img" src="'+w.thumbnail+'" alt="'+dgEscapeHtml(w.title)+'" loading="lazy" '+
+    'onerror="this.onerror=null;this.src=\''+DG_FALLBACK_IMG+'\'">'+
+    '<div class="dg-card-body"><div class="dg-card-title">'+dgEscapeHtml(w.title)+'</div>'+
+    '<div class="dg-card-meta">'+dgEscapeHtml(w.author||defaultAuthor)+'</div></div></a>';
+}
+
+function dgSkeletonHtml(){
+  return '<div class="dg-skeleton"></div><div class="dg-skeleton-body"></div><div class="dg-skeleton"></div><div class="dg-skeleton-body"></div><div class="dg-skeleton"></div><div class="dg-skeleton-body"></div>';
+}
+
+function dgFallbackHtml(msg,link,linkText){
+  return '<div class="dg-fallback">'+msg+'<br><a href="'+link+'" target="_blank">'+linkText+' ↗</a></div>';
+}
+
+function loadDesignWorks(force){
+  if(!force){
+    try{
+      var raw=localStorage.getItem(DG_CACHE_KEY);
+      if(raw){
+        var data=JSON.parse(raw);
+        if(Date.now()-data.timestamp<DG_CACHE_TIME){
+          renderDesignGallery(data.works);
+          return;
+        }
+      }
+    }catch(e){}
+  }
+  renderDGSkeletons();
+  Promise.allSettled([
+    fetchDribbbleWorks(),
+    fetchJapanDesignWorks(),
+    fetchZcoolWorks()
+  ]).then(function(results){
+    var works={
+      dribbble:results[0].status==='fulfilled'?results[0].value:[],
+      japan:results[1].status==='fulfilled'?results[1].value:[],
+      zcool:results[2].status==='fulfilled'?results[2].value:[]
+    };
+    try{
+      localStorage.setItem(DG_CACHE_KEY,JSON.stringify({timestamp:Date.now(),works:works}));
+    }catch(e){}
+    renderDesignGallery(works);
+  });
+}
+
+function renderDGSkeletons(){
+  var s=dgSkeletonHtml();
+  var z=document.getElementById('dg-zcool');
+  var d=document.getElementById('dg-dribbble');
+  var j=document.getElementById('dg-japan');
+  if(z)z.innerHTML=s;
+  if(d)d.innerHTML=s;
+  if(j)j.innerHTML=s;
+}
+
+function renderDesignGallery(works){
+  // Dribbble
+  var dEl=document.getElementById('dg-dribbble');
+  if(dEl){
+    if(works.dribbble&&works.dribbble.length>0){
+      dEl.innerHTML=works.dribbble.map(function(w){return dgCardHtml(w,'Dribbble');}).join('');
+    }else{
+      dEl.innerHTML=dgFallbackHtml('⚠️ 暂时无法加载 Dribbble 作品','https://dribbble.com/shots/popular','点击访问 Dribbble 热门');
+    }
+  }
+  // Japan Design
+  var jEl=document.getElementById('dg-japan');
+  if(jEl){
+    if(works.japan&&works.japan.length>0){
+      jEl.innerHTML=works.japan.map(function(w){return dgCardHtml(w,'Japan Design');}).join('');
+    }else{
+      jEl.innerHTML=dgFallbackHtml('⚠️ 暂时无法加载 Japan Design 内容','https://www.japandesign.ne.jp','点击访问 Japan Design');
+    }
+  }
+  // 站酷
+  var zEl=document.getElementById('dg-zcool');
+  if(zEl){
+    if(works.zcool&&works.zcool.length>0){
+      zEl.innerHTML=works.zcool.map(function(w){return dgCardHtml(w,'站酷');}).join('');
+    }else{
+      zEl.innerHTML=dgFallbackHtml('📌 站酷内容需在官网动态加载','https://www.zcool.com.cn/discover','点击访问站酷发现页');
+    }
+  }
+}
+
+async function fetchDribbbleWorks(){
+  var resp=await fetch(DG_PROXY+encodeURIComponent('https://dribbble.com/shots/popular'));
+  var html=await resp.text();
+  // Extract shot URLs
+  var shotRe=/href="(https:\/\/dribbble\.com\/shots\/\d+-[^"]+)"/g;
+  var shots=[];
+  var m;
+  while((m=shotRe.exec(html))!==null){
+    var url=m[1].replace(/&amp;/g,'&');
+    if(!shots.find(function(s){return s.url===url;})){
+      shots.push({url:url,title:'',author:'',thumbnail:''});
+    }
+  }
+  // Extract titles from "View xxx" links
+  var titleRe=/href="https:\/\/dribbble\.com\/shots\/(\d+)-[^"]*">\s*View\s+([^<]+)<\/a>/g;
+  while((m=titleRe.exec(html))!==null){
+    var s=shots.find(function(x){return x.url.indexOf('/shots/'+m[1]+'-')!==-1;});
+    if(s)s.title=m[2].trim();
+  }
+  // Also try to get titles from alt attributes
+  var altRe=/<img[^>]+alt="([^"]{10,})"[^>]+src="(https:\/\/cdn\.dribbble\.com\/userupload\/[^"]+)"/g;
+  while((m=altRe.exec(html))!==null){
+    var img=m[2].replace(/&amp;/g,'&');
+    // Find a shot that doesn't have a thumbnail yet
+    var shot=shots.find(function(x){return !x.thumbnail;});
+    if(shot){
+      shot.thumbnail=img;
+      if(!shot.title)shot.title=m[1].split(/\s+/).slice(0,8).join(' ');
+    }
+  }
+  // Also extract all CDN image URLs via regex on raw HTML
+  var imgRe=/(https:\/\/cdn\.dribbble\.com\/userupload\/[^"'\s)]+)/g;
+  var imgUrls=[];
+  while((m=imgRe.exec(html))!==null){
+    var u=m[1].replace(/&amp;/g,'&');
+    if(imgUrls.indexOf(u)===-1)imgUrls.push(u);
+  }
+  // Assign images to shots by order
+  for(var i=0;i<shots.length&&i<imgUrls.length;i++){
+    if(!shots[i].thumbnail)shots[i].thumbnail=imgUrls[i];
+  }
+  // Filter shots with both title and thumbnail
+  var result=shots.filter(function(s){return s.title&&s.thumbnail;}).slice(0,4);
+  if(result.length===0)throw new Error('No dribbble shots');
+  return result;
+}
+
+async function fetchJapanDesignWorks(){
+  var resp=await fetch(DG_PROXY+encodeURIComponent('https://www.japandesign.ne.jp/feed/'));
+  var xmlText=await resp.text();
+  var parser=new DOMParser();
+  var xml=parser.parseFromString(xmlText,'text/xml');
+  var items=xml.querySelectorAll('item');
+  var works=[];
+  items.forEach(function(item){
+    var title=item.querySelector('title')?item.querySelector('title').textContent:'';
+    var link=item.querySelector('link')?item.querySelector('link').textContent:'';
+    var desc=item.querySelector('description')?item.querySelector('description').textContent:'';
+    var pubDate=item.querySelector('pubDate')?item.querySelector('pubDate').textContent:'';
+    // Extract image from description HTML
+    var imgM=desc.match(/<img[^>]+src=["']([^"']+)["']/);
+    var thumbnail=imgM?imgM[1]:'';
+    if(title&&link&&thumbnail){
+      var dateStr='';
+      if(pubDate){
+        var d=new Date(pubDate);
+        dateStr=(d.getMonth()+1)+'\u6708'+d.getDate()+'\u65e5';
+      }
+      works.push({title:title,url:link,thumbnail:thumbnail,author:dateStr||'Japan Design'});
+    }
+  });
+  if(works.length===0)throw new Error('No japan design items');
+  return works.slice(0,4);
+}
+
+async function fetchZcoolWorks(){
+  // 站酷 is a SPA, content loaded via JS, static HTML fetch won't work
+  return [];
+}
 
 // ========== AI Assistant ==========
 
