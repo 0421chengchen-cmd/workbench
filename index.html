@@ -2989,7 +2989,6 @@ input,textarea{font-family:inherit;}
           <li>点击「New Project」创建项目，名称随意填（如 my-workbench），设置数据库密码</li>
           <li>等待项目创建完成（约 1-2 分钟），进入项目后点击左侧「SQL Editor」</li>
           <li>将下方建表代码粘贴进去，点击「Run」执行：</li>
-        </ol>
         <div style="margin:10px 0;padding:12px;background:#1e1e1e;color:#d4d4d4;border-radius:8px;font-family:monospace;font-size:12px;overflow-x:auto;white-space:pre;">CREATE TABLE IF NOT EXISTS workbench_data (
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
   data_key TEXT NOT NULL,
