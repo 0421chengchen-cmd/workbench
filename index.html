@@ -1559,8 +1559,19 @@ input,textarea{font-family:inherit;}
     <div class="card">
       <div class="card-title">📅 每日时间轴 <span style="font-size:11px;font-weight:500;color:var(--text-secondary);margin-left:8px;">点击圆点标记完成 · 长按可调整时间</span></div>
       <div class="timeline" id="overview-timeline">
-        <div class="timeline-item" data-task="english" data-start="07:00" data-duration="30">
-          <div class="timeline-time">07:00</div>
+        <div class="timeline-item" data-task="washup" data-start="08:30" data-duration="30">
+          <div class="timeline-time" style="color:#9ca3af;">08:30</div>
+          <div class="timeline-bar" style="background:#9ca3af;opacity:.4;"></div>
+          <div class="timeline-content" style="background:rgba(156,163,175,0.06);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="tl-check" onclick="toggleTimelineTask(this,'washup')" title="标记完成/未完成"></div>
+              <div><div class="tc-name" style="color:#6b7280;">🚿 起床洗漱</div><div class="tc-desc">起床 → 洗漱 → 准备开始一天</div></div>
+            </div>
+            <div class="tc-duration" style="background:#9ca3af;opacity:.5;">30min</div>
+          </div>
+        </div>
+        <div class="timeline-item" data-task="english" data-start="09:00" data-duration="30">
+          <div class="timeline-time">09:00</div>
           <div class="timeline-bar" style="background:var(--c-english);"></div>
           <div class="timeline-content">
             <div style="display:flex;align-items:center;gap:10px;">
@@ -1570,8 +1581,8 @@ input,textarea{font-family:inherit;}
             <div class="tc-duration" style="background:var(--c-english);">30min</div>
           </div>
         </div>
-        <div class="timeline-item" data-task="sing" data-start="07:30" data-duration="30">
-          <div class="timeline-time">07:30</div>
+        <div class="timeline-item" data-task="sing" data-start="09:30" data-duration="30">
+          <div class="timeline-time">09:30</div>
           <div class="timeline-bar" style="background:var(--c-sing);"></div>
           <div class="timeline-content">
             <div style="display:flex;align-items:center;gap:10px;">
@@ -1581,19 +1592,41 @@ input,textarea{font-family:inherit;}
             <div class="tc-duration" style="background:var(--c-sing);">30min</div>
           </div>
         </div>
-        <div class="timeline-item" data-task="design" data-start="08:30" data-duration="210">
-          <div class="timeline-time">08:30</div>
+        <div class="timeline-item" data-task="design1" data-start="10:00" data-duration="120">
+          <div class="timeline-time">10:00</div>
           <div class="timeline-bar" style="background:var(--c-design);"></div>
           <div class="timeline-content">
             <div style="display:flex;align-items:center;gap:10px;">
-              <div class="tl-check" onclick="toggleTimelineTask(this,'design')" title="标记完成/未完成"></div>
-              <div><div class="tc-name">🎨 设计工作</div><div class="tc-desc">上午专注力峰值，创意产出最佳时段</div></div>
+              <div class="tl-check" onclick="toggleTimelineTask(this,'design1')" title="标记完成/未完成"></div>
+              <div><div class="tc-name">🎨 设计工作（上午）</div><div class="tc-desc">上午专注力峰值，创意产出最佳时段</div></div>
             </div>
-            <div class="tc-duration" style="background:var(--c-design);">3.5h</div>
+            <div class="tc-duration" style="background:var(--c-design);">2h</div>
           </div>
         </div>
-        <div class="timeline-item" data-task="fitness" data-start="13:00" data-duration="90">
-          <div class="timeline-time">13:00</div>
+        <div class="timeline-item" data-task="lunch" data-start="12:00" data-duration="90">
+          <div class="timeline-time" style="color:#9ca3af;">12:00</div>
+          <div class="timeline-bar" style="background:#9ca3af;opacity:.4;"></div>
+          <div class="timeline-content" style="background:rgba(156,163,175,0.06);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="tl-check" onclick="toggleTimelineTask(this,'lunch')" title="标记完成/未完成"></div>
+              <div><div class="tc-name" style="color:#6b7280;">🍽️ 午饭午休</div><div class="tc-desc">30 分钟吃饭 + 60 分钟午睡恢复精力</div></div>
+            </div>
+            <div class="tc-duration" style="background:#9ca3af;opacity:.5;">1.5h</div>
+          </div>
+        </div>
+        <div class="timeline-item" data-task="design2" data-start="13:30" data-duration="90">
+          <div class="timeline-time">13:30</div>
+          <div class="timeline-bar" style="background:var(--c-design);"></div>
+          <div class="timeline-content">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="tl-check" onclick="toggleTimelineTask(this,'design2')" title="标记完成/未完成"></div>
+              <div><div class="tc-name">🎨 设计工作（下午）</div><div class="tc-desc">午休后继续设计任务，完成 3.5h 总量</div></div>
+            </div>
+            <div class="tc-duration" style="background:var(--c-design);">1.5h</div>
+          </div>
+        </div>
+        <div class="timeline-item" data-task="fitness" data-start="15:00" data-duration="90">
+          <div class="timeline-time">15:00</div>
           <div class="timeline-bar" style="background:var(--c-fitness);"></div>
           <div class="timeline-content">
             <div style="display:flex;align-items:center;gap:10px;">
@@ -1603,19 +1636,19 @@ input,textarea{font-family:inherit;}
             <div class="tc-duration" style="background:var(--c-fitness);">1.5h</div>
           </div>
         </div>
-        <div class="timeline-item" data-task="ailearn" data-start="15:00" data-duration="60">
-          <div class="timeline-time">15:00</div>
+        <div class="timeline-item" data-task="ailearn" data-start="16:30" data-duration="60">
+          <div class="timeline-time">16:30</div>
           <div class="timeline-bar" style="background:var(--c-ailearn);"></div>
           <div class="timeline-content">
             <div style="display:flex;align-items:center;gap:10px;">
               <div class="tl-check" onclick="toggleTimelineTask(this,'ailearn')" title="标记完成/未完成"></div>
-              <div><div class="tc-name">🤖 学习 AI 知识</div><div class="tc-desc">午休后学习时段，吸收新知识</div></div>
+              <div><div class="tc-name">🤖 学习 AI 知识</div><div class="tc-desc">健身后学习时段，吸收新知识</div></div>
             </div>
             <div class="tc-duration" style="background:var(--c-ailearn);">1h</div>
           </div>
         </div>
-        <div class="timeline-item" data-task="dance" data-start="16:00" data-duration="120">
-          <div class="timeline-time">16:00</div>
+        <div class="timeline-item" data-task="dance" data-start="17:30" data-duration="120">
+          <div class="timeline-time">17:30</div>
           <div class="timeline-bar" style="background:var(--c-dance);"></div>
           <div class="timeline-content">
             <div style="display:flex;align-items:center;gap:10px;">
@@ -1625,8 +1658,8 @@ input,textarea{font-family:inherit;}
             <div class="tc-duration" style="background:var(--c-dance);">2h</div>
           </div>
         </div>
-        <div class="timeline-item" data-task="stream" data-start="19:00" data-duration="120">
-          <div class="timeline-time">19:00</div>
+        <div class="timeline-item" data-task="stream" data-start="19:30" data-duration="120">
+          <div class="timeline-time">19:30</div>
           <div class="timeline-bar" style="background:var(--c-stream);"></div>
           <div class="timeline-content">
             <div style="display:flex;align-items:center;gap:10px;">
@@ -1636,19 +1669,8 @@ input,textarea{font-family:inherit;}
             <div class="tc-duration" style="background:var(--c-stream);">2h</div>
           </div>
         </div>
-        <div class="timeline-item" data-task="sleep" data-start="23:00" data-duration="480">
-          <div class="timeline-time" style="color:#6b7280;">23:00</div>
-          <div class="timeline-bar" style="background:#374151;opacity:.4;"></div>
-          <div class="timeline-content" style="background:rgba(55,65,81,0.06);">
-            <div style="display:flex;align-items:center;gap:10px;">
-              <div class="tl-check" onclick="toggleTimelineTask(this,'sleep')" title="标记完成/未完成"></div>
-              <div><div class="tc-name" style="color:#6b7280;">😴 睡眠</div><div class="tc-desc">固定 7-8 小时 · 23:00 入睡 · 保证恢复</div></div>
-            </div>
-            <div class="tc-duration" style="background:#374151;opacity:.5;">7-8h</div>
-          </div>
-        </div>
-        <div class="timeline-item" data-task="review" data-start="21:00" data-duration="30">
-          <div class="timeline-time">21:00</div>
+        <div class="timeline-item" data-task="review" data-start="21:30" data-duration="30">
+          <div class="timeline-time">21:30</div>
           <div class="timeline-bar" style="background:#f59e0b;"></div>
           <div class="timeline-content">
             <div style="display:flex;align-items:center;gap:10px;">
@@ -1658,12 +1680,23 @@ input,textarea{font-family:inherit;}
             <div class="tc-duration" style="background:#f59e0b;">30min</div>
           </div>
         </div>
+        <div class="timeline-item" data-task="sleep" data-start="24:00" data-duration="510">
+          <div class="timeline-time" style="color:#6b7280;">24:00</div>
+          <div class="timeline-bar" style="background:#374151;opacity:.4;"></div>
+          <div class="timeline-content" style="background:rgba(55,65,81,0.06);">
+            <div style="display:flex;align-items:center;gap:10px;">
+              <div class="tl-check" onclick="toggleTimelineTask(this,'sleep')" title="标记完成/未完成"></div>
+              <div><div class="tc-name" style="color:#6b7280;">😴 睡眠</div><div class="tc-desc">8.5 小时 · 24:00 入睡 · 08:30 起床</div></div>
+            </div>
+            <div class="tc-duration" style="background:#374151;opacity:.5;">8.5h</div>
+          </div>
+        </div>
       </div>
       <!-- Timeline summary bar -->
       <div style="margin-top:14px;padding:12px 16px;background:var(--bg);border-radius:var(--radius-sm);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
         <div style="font-size:13px;font-weight:600;color:var(--text-secondary);">📊 今日完成情况</div>
         <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
-          <span id="tl-completed-count" style="font-size:13px;">已完成 0 / 9 项</span>
+          <span id="tl-completed-count" style="font-size:13px;">已完成 0 / 12 项</span>
           <div style="width:120px;"><div class="progress-bar"><div class="progress-fill" id="tl-progress-fill" style="width:0%;background:linear-gradient(90deg,#8b5cf6,#ec4899);"></div></div></div>
           <span id="tl-progress-pct" style="font-size:13px;font-weight:700;">0%</span>
           <button onclick="adjustUncompletedTasks()" style="background:rgba(245,158,11,0.12);color:#d97706;border:none;border-radius:8px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;">⏰ 调整未完成项</button>
@@ -1697,13 +1730,17 @@ input,textarea{font-family:inherit;}
   <div class="card">
     <div class="card-title">✅ 今日任务清单</div>
     <div class="checklist" id="overview-checklist">
-      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">07:00 英语口语 — 晨间跟读练习 30 分钟</span></div>
-      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">07:30 唱歌练声 — 气息控制 + 音阶热身 30 分钟</span></div>
-      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">08:30 设计工作 — 今日设计任务 3.5 小时</span></div>
-      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">13:00 健身训练 — 今日训练计划 1.5 小时</span></div>
-      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">15:00 AI 学习 — 阅读教程 / 实践练习 1 小时</span></div>
-      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">16:00 跳舞训练 — 舞蹈编排 + 反复练习 2 小时</span></div>
-      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">19:00 直播 — 互动聊天 + 才艺展示 2 小时</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">08:30 起床洗漱 — 洗漱准备 30 分钟</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">09:00 英语口语 — 晨间跟读练习 30 分钟</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">09:30 唱歌练声 — 气息控制 + 音阶热身 30 分钟</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">10:00 设计工作（上午）— 专注设计 2 小时</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">12:00 午饭午休 — 吃饭 + 午睡 1.5 小时</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">13:30 设计工作（下午）— 继续设计 1.5 小时</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">15:00 健身训练 — 今日训练计划 1.5 小时</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">16:30 AI 学习 — 阅读教程 / 实践练习 1 小时</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">17:30 跳舞训练 — 舞蹈编排 + 反复练习 2 小时</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">19:30 直播 — 互动聊天 + 才艺展示 2 小时</span></div>
+      <div class="checklist-item" onclick="toggleCheck(this)"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">21:30 每日复盘 — KISS + GRAI 复盘 30 分钟</span></div>
       <div class="checklist-item" onclick="toggleCheck(this);navTo('review')"><div class="ci-box"><svg width="12" height="12" viewBox="0 0 12 12"><path d="M2 6L5 9L10 3" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg></div><span class="ci-text">21:00 每日复盘 — KISS + GRAI 结构化复盘（点击进入复盘页面）</span></div>
     </div>
   </div>
@@ -1722,8 +1759,11 @@ input,textarea{font-family:inherit;}
           <circle cx="100" cy="100" r="80" fill="none" stroke="#14b8a6" stroke-width="24" stroke-dasharray="10.5 492.15" stroke-dashoffset="-188.5"/>
           <circle cx="100" cy="100" r="80" fill="none" stroke="#22c55e" stroke-width="24" stroke-dasharray="10.5 492.15" stroke-dashoffset="-199"/>
           <circle cx="100" cy="100" r="80" fill="none" stroke="#6366f1" stroke-width="24" stroke-dasharray="20.9 481.75" stroke-dashoffset="-209.5"/>
-          <circle cx="100" cy="100" r="80" fill="none" stroke="#374151" stroke-width="24" stroke-dasharray="167.5 335.15" stroke-dashoffset="-230.4" opacity="0.3"/>
-          <circle cx="100" cy="100" r="80" fill="none" stroke="#9ca3af" stroke-width="24" stroke-dasharray="104.7 397.95" stroke-dashoffset="-397.9" opacity="0.2"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#f59e0b" stroke-width="24" stroke-dasharray="10.5 492.15" stroke-dashoffset="-230.4"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#9ca3af" stroke-width="24" stroke-dasharray="10.5 492.15" stroke-dashoffset="-240.9" opacity="0.4"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#9ca3af" stroke-width="24" stroke-dasharray="31.4 471.25" stroke-dashoffset="-251.4" opacity="0.3"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#374151" stroke-width="24" stroke-dasharray="178.0 324.65" stroke-dashoffset="-282.8" opacity="0.3"/>
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#d1d5db" stroke-width="24" stroke-dasharray="41.9 460.75" stroke-dashoffset="-460.8" opacity="0.2"/>
         </svg>
         <div class="donut-center">
           <div class="num">11h</div>
@@ -1738,14 +1778,17 @@ input,textarea{font-family:inherit;}
         <div class="legend-item"><span class="legend-dot" style="background:#14b8a6;"></span><span class="legend-name">唱歌</span><span class="legend-time">0.5h</span><span class="legend-pct">2.1%</span></div>
         <div class="legend-item"><span class="legend-dot" style="background:#22c55e;"></span><span class="legend-name">英语</span><span class="legend-time">0.5h</span><span class="legend-pct">2.1%</span></div>
         <div class="legend-item"><span class="legend-dot" style="background:#6366f1;"></span><span class="legend-name">AI 学习</span><span class="legend-time">1h</span><span class="legend-pct">4.2%</span></div>
-        <div class="legend-item"><span class="legend-dot" style="background:#374151;opacity:.4;"></span><span class="legend-name">睡眠（固定）</span><span class="legend-time">7-8h</span><span class="legend-pct">~31%</span></div>
-        <div class="legend-item"><span class="legend-dot" style="background:#9ca3af;opacity:.3;"></span><span class="legend-name">餐饮休息</span><span class="legend-time">5h</span><span class="legend-pct">20.8%</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#f59e0b;"></span><span class="legend-name">复盘</span><span class="legend-time">0.5h</span><span class="legend-pct">2.1%</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#9ca3af;opacity:.4;"></span><span class="legend-name">洗漱</span><span class="legend-time">0.5h</span><span class="legend-pct">2.1%</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#9ca3af;opacity:.3;"></span><span class="legend-name">午饭午休</span><span class="legend-time">1.5h</span><span class="legend-pct">6.3%</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#374151;opacity:.4;"></span><span class="legend-name">睡眠</span><span class="legend-time">8.5h</span><span class="legend-pct">35.4%</span></div>
+        <div class="legend-item"><span class="legend-dot" style="background:#d1d5db;opacity:.3;"></span><span class="legend-name">自由时间</span><span class="legend-time">2h</span><span class="legend-pct">8.3%</span></div>
       </div>
     </div>
   </div>
 
   <div class="tip-box">
-    💡 <b>时间规划核心思路：</b>脑力任务（设计、英语、AI学习）安排在上午，体力任务（健身、跳舞）放下午，社交任务（直播）放晚间黄金时段。睡眠固定 7-8 小时（23:00-07:00）。每日 21:00 进行 KISS + GRAI 复盘，未完成任务可延后或调整时间。
+    💡 <b>时间规划核心思路：</b>8:30 起床洗漱，脑力任务（英语、唱歌、设计）安排在上午，午饭午休 12:00-13:30 恢复精力，下午继续设计后进行体力任务（健身、跳舞），社交任务（直播）放晚间黄金时段。睡眠 24:00-08:30 共 8.5 小时。每日 21:30 进行 KISS + GRAI 复盘，未完成任务可延后或调整时间。
   </div>
 </section>
 
@@ -1755,7 +1798,7 @@ input,textarea{font-family:inherit;}
     <div class="sh-icon">🎨</div>
     <div>
       <div class="sh-title">AI 设计</div>
-      <div class="sh-sub">每日 08:30 - 12:00 · 3.5 小时 · 创意产出核心时段</div>
+      <div class="sh-sub">每日 10:00-12:00 / 13:30-15:00 · 3.5 小时 · 创意产出核心时段</div>
     </div>
   </div>
 
@@ -1883,7 +1926,7 @@ input,textarea{font-family:inherit;}
     <div class="sh-icon">📺</div>
     <div>
       <div class="sh-title">直播规划</div>
-      <div class="sh-sub">每日 19:00 - 21:00 · 2 小时 · 晚间黄金时段</div>
+      <div class="sh-sub">每日 19:30 - 21:30 · 2 小时 · 晚间黄金时段</div>
     </div>
   </div>
 
@@ -2150,7 +2193,7 @@ input,textarea{font-family:inherit;}
     <div class="sh-icon">💪</div>
     <div>
       <div class="sh-title">健身规划</div>
-      <div class="sh-sub">每日 13:00 - 14:30 · 1.5 小时 · 午后精力激活</div>
+      <div class="sh-sub">每日 15:00 - 16:30 · 1.5 小时 · 午后精力激活</div>
     </div>
   </div>
 
@@ -2262,7 +2305,7 @@ input,textarea{font-family:inherit;}
   </div>
 
   <div class="tip-box">
-    💡 <b>健身与主播职业结合：</b>健身不仅提升体态和镜头表现力，跳舞和直播也需要良好的体能支撑。力量训练提升舞蹈爆发力，有氧训练增强直播续航能力。午后 13:00 训练能有效对抗饭后困倦。
+    💡 <b>健身与主播职业结合：</b>健身不仅提升体态和镜头表现力，跳舞和直播也需要良好的体能支撑。力量训练提升舞蹈爆发力，有氧训练增强直播续航能力。下午 15:00 训练能有效衔接设计与跳舞之间的体能过渡。
   </div>
 </section>
 
@@ -2272,7 +2315,7 @@ input,textarea{font-family:inherit;}
     <div class="sh-icon">💃</div>
     <div>
       <div class="sh-title">跳舞训练</div>
-      <div class="sh-sub">每日 16:00 - 18:00 · 2 小时 · 体力充沛时段</div>
+      <div class="sh-sub">每日 17:30 - 19:30 · 2 小时 · 体力充沛时段</div>
     </div>
   </div>
 
@@ -2385,7 +2428,7 @@ input,textarea{font-family:inherit;}
     <div class="sh-icon">🎤</div>
     <div>
       <div class="sh-title">唱歌表演</div>
-      <div class="sh-sub">每日 07:30 - 08:00 · 30 分钟 · 晨间开嗓热身</div>
+      <div class="sh-sub">每日 09:30 - 10:00 · 30 分钟 · 晨间开嗓热身</div>
     </div>
   </div>
 
@@ -2490,7 +2533,7 @@ input,textarea{font-family:inherit;}
     <div class="sh-icon">🇬🇧</div>
     <div>
       <div class="sh-title">英语口语</div>
-      <div class="sh-sub">每日 07:00 - 07:30 · 30 分钟 · 晨间语言黄金期</div>
+      <div class="sh-sub">每日 09:00 - 09:30 · 30 分钟 · 晨间语言黄金期</div>
     </div>
   </div>
 
@@ -2609,7 +2652,7 @@ input,textarea{font-family:inherit;}
     <div class="sh-icon">🤖</div>
     <div>
       <div class="sh-title">学习 AI 知识</div>
-      <div class="sh-sub">每日 15:00 - 16:00 · 1 小时 · 午休后学习时段</div>
+      <div class="sh-sub">每日 16:30 - 17:30 · 1 小时 · 健身后学习时段</div>
     </div>
   </div>
 
@@ -2739,7 +2782,7 @@ input,textarea{font-family:inherit;}
     <div class="sh-icon">📝</div>
     <div>
       <div class="sh-title">每日复盘</div>
-      <div class="sh-sub">每日 21:00 · KISS 日常复盘 + GRAI 重大事项复盘 · 自动化闭环</div>
+      <div class="sh-sub">每日 21:30 · KISS 日常复盘 + GRAI 重大事项复盘 · 自动化闭环</div>
     </div>
   </div>
 
@@ -3743,13 +3786,17 @@ function loadWeatherCache(){
 
 // ========== Live Time & Activity ==========
 const schedule=[
-  {start:7*60, end:7.5*60, name:'🇬🇧 英语口语练习', color:'var(--c-english)', duration:'30min'},
-  {start:7.5*60, end:8*60, name:'🎤 唱歌练声', color:'var(--c-sing)', duration:'30min'},
-  {start:8.5*60, end:12*60, name:'🎨 设计工作', color:'var(--c-design)', duration:'3.5h'},
-  {start:13*60, end:14.5*60, name:'💪 健身训练', color:'var(--c-fitness)', duration:'1.5h'},
-  {start:15*60, end:16*60, name:'🤖 学习 AI 知识', color:'var(--c-ailearn)', duration:'1h'},
-  {start:16*60, end:18*60, name:'💃 跳舞训练', color:'var(--c-dance)', duration:'2h'},
-  {start:19*60, end:21*60, name:'📺 直播', color:'var(--c-stream)', duration:'2h'}
+  {start:8.5*60, end:9*60, name:'🚿 起床洗漱', color:'#9ca3af', duration:'30min'},
+  {start:9*60, end:9.5*60, name:'🇬🇧 英语口语练习', color:'var(--c-english)', duration:'30min'},
+  {start:9.5*60, end:10*60, name:'🎤 唱歌练声', color:'var(--c-sing)', duration:'30min'},
+  {start:10*60, end:12*60, name:'🎨 设计工作（上午）', color:'var(--c-design)', duration:'2h'},
+  {start:12*60, end:13.5*60, name:'🍽️ 午饭午休', color:'#9ca3af', duration:'1.5h'},
+  {start:13.5*60, end:15*60, name:'🎨 设计工作（下午）', color:'var(--c-design)', duration:'1.5h'},
+  {start:15*60, end:16.5*60, name:'💪 健身训练', color:'var(--c-fitness)', duration:'1.5h'},
+  {start:16.5*60, end:17.5*60, name:'🤖 学习 AI 知识', color:'var(--c-ailearn)', duration:'1h'},
+  {start:17.5*60, end:19.5*60, name:'💃 跳舞训练', color:'var(--c-dance)', duration:'2h'},
+  {start:19.5*60, end:21.5*60, name:'📺 直播', color:'var(--c-stream)', duration:'2h'},
+  {start:21.5*60, end:22*60, name:'📝 每日复盘', color:'#f59e0b', duration:'30min'}
 ];
 
 function getCurrentActivity(){
@@ -4035,7 +4082,8 @@ function adjustUncompletedTasks(){
     return;
   }
   const taskNames = {
-    english:'英语口语', sing:'唱歌练声', design:'设计工作', fitness:'健身训练',
+    washup:'起床洗漱', english:'英语口语', sing:'唱歌练声', design1:'设计(上午)',
+    lunch:'午饭午休', design2:'设计(下午)', fitness:'健身训练',
     ailearn:'AI学习', dance:'跳舞训练', stream:'直播', review:'每日复盘'
   };
   let msg = `📋 以下 ${uncompleted.length} 项任务未完成：\n\n`;
